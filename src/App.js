@@ -1,27 +1,39 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from 'react'
+import { render } from 'react-dom'
 
-class App extends Component {
+import 'bootstrap/dist/css/bootstrap.min.css'
+import 'font-awesome/css/font-awesome.min.css'
+
+import 'react-big-calendar/lib/css/react-big-calendar.css'
+import 'react-datepicker/dist/react-datepicker.css'
+import './styles.css'
+import './prism.css'
+import Card from './Card'
+import AdminCalendar from './basic'
+import Dropdown from 'react-bootstrap/lib/Dropdown'
+import MenuItem from 'react-bootstrap/lib/MenuItem'
+
+
+class App extends React.Component {
+  constructor(...args) {
+    super(...args)
+  }
+
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+      <div className="app">
+        <div className="jumbotron">
+          <div className="container">
+            Permis de construire agenda des activités.
+          </div>
+        </div>
+        <div className="examples">
+          <div className="example">
+            <AdminCalendar />
+          </div>
+        </div>
       </div>
-    );
+    )
   }
 }
 
