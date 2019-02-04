@@ -1,10 +1,6 @@
 import React from 'react'
 
 class EventWrapper extends React.Component {
-  constructor(props, context) {
-    super(props, context);
-  }
-
   render(){
     let colorWrapper;
     if(this.props.event.pillar === 'Bien vivre') {
@@ -15,6 +11,8 @@ class EventWrapper extends React.Component {
       colorWrapper = 'orangePillar'
     } else if (this.props.event.pillar === 'Bien faire') {
       colorWrapper = 'bluePillar'
+    } else if (this.props.event.pillar === 'Fermeture') {
+      colorWrapper = 'grayPillar'
     }
     return (
       <div className={colorWrapper}>

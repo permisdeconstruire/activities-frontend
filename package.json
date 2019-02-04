@@ -7,6 +7,7 @@
     "date-fns": "2.0.0-alpha.2",
     "font-awesome": "^4.7.0",
     "globalize": "^0",
+    "lodash": "^4.17.11",
     "moment": "^2.24.0",
     "react": "^16.7.0",
     "react-big-calendar": "^0.20.3",
@@ -19,7 +20,7 @@
   },
   "scripts": {
     "start": "REACT_APP_BACKEND=http://127.0.0.1:3000 react-scripts start",
-    "build": "react-scripts build",
+    "build": "REACT_APP_BACKEND=https://api.pdc.bug.builders react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

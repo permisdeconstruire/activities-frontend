@@ -277,3 +277,33 @@ h4 a:focus .anchor-icon {
   background-color: #008bd0;
   border: 1px solid #008bd0;
 }
+
+.grayPillar .rbc-event {
+  background-color: #858585;
+  border: 1px solid #858585;
+}
+
+.rbc-event-content .event-place a {
+  line-height:2;
+  font-size: 12px;
+  color: white;
+}
+
+.rbc-event-content .event-place a:hover {
+  text-decoration: underline;
+}
+
+.rbc-event-content .event-annotation {
+  line-height:2;
+  margin-top:5px;
+  margin-bottom:5px;
+  font-size: 10px;
+  text-align: center;
+}
+
+.rbc-event-content .event-participants {
+  line-height:2;
+  text-align: right;
+  font-style: italic;
+  font-size: 12px;
+}
