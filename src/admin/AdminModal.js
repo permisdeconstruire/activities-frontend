@@ -14,11 +14,12 @@ import {
 import DatePicker from 'react-datepicker'
 import { registerLocale }  from 'react-datepicker'
 import fr from 'date-fns/locale/fr';
+import {authFetch} from '../common/utils'
 registerLocale('fr', fr);
 
 const dateFormat = 'dd/MM/YYYY HH:mm'
 
-const skills = require('./skills.json')
+const skills = require('../common/skills.json')
 
 const pillars = [
   'Fermeture',
@@ -34,24 +35,26 @@ const themes = [
   'theme 3',
 ]
 
-const defaultState = {
-  title: '',
-  id: '',
-  start: new Date(),
-  end: new Date(),
-  pillar: pillars[0],
-  theme: themes[0],
-  contributor: '',
-  pedagogy: [],
-  cost: 0,
-  place: '',
-  annotation: '',
-  copilot: '',
-  step:0,
-  copyActivity: 'none'
-};
-
 class AdminModal extends React.Component {
+
+  defaultState() {
+    return {
+      title: '',
+      id: '',
+      start: new Date(),
+      end: new Date(),
+      pillar: pillars[0],
+      theme: themes[0],
+      contributor: '',
+      pedagogy: [],
+      cost: 0,
+      place: '',
+      annotation: '',
+      copilot: '',
+      step:0,
+      copyActivity: 'none'
+    };
+  }
 
   constructor(props, context) {
     super(props, context);
@@ -65,16 +68,16 @@ class AdminModal extends React.Component {
     this.deletePedagogy = this.deletePedagogy.bind(this);
     this.handleChangePedagogy = this.handleChangePedagogy.bind(this);
     this.copyActivity = this.copyActivity.bind(this);
-    this.state = defaultState;
+    this.state = this.defaultState();
   }
 
   componentDidUpdate(prevProps, prevState) {
     if(prevProps.currentEventId !== this.props.currentEventId || prevProps.start.toString() !== this.props.start.toString() || prevProps.end.toString() !== this.props.end.toString()) {
       let newState;
       if(this.props.currentEventId === '') {
-        defaultState.start = this.props.start;
-        defaultState.end = this.props.end;
-        newState = defaultState;
+        newState = this.defaultState();
+        newState.start = this.props.start;
+        newState.end = this.props.end;
       } else {
         newState = this.props.events.find(event => event.id === this.props.currentEventId)
       }
@@ -84,7 +87,7 @@ class AdminModal extends React.Component {
 
   copyActivity(event) {
     if(event.target.value === 'none') {
-      this.setState(defaultState);
+      this.setState(this.defaultState());
     } else {
       const newState = this.state;
       newState.copyActivity = event.target.value;
@@ -136,10 +139,9 @@ class AdminModal extends React.Component {
   handleDelete() {
     const yes = window.confirm('Etes vous certains de vouloir supprimer cet événement ?');
     if(yes) {
-      fetch(`${process.env.REACT_APP_BACKEND}/v0/activities/id/${this.state.id}`, {
+      authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/activities/id/${this.state.id}`, {
         method: 'DELETE'
       })
-      .then(res => res.json())
       .then(res => {
         this.props.onClose();
         this.props.refresh();
@@ -164,27 +166,25 @@ class AdminModal extends React.Component {
     }
 
     if(id !== '') {
-      fetch(`${process.env.REACT_APP_BACKEND}/v0/activities/id/${id}`, {
+      authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/activities/id/${id}`, {
         method: 'PUT',
         body: JSON.stringify(data),
         headers:{
           'Content-Type': 'application/json'
         }
       })
-      .then(res => res.json())
       .then(res => {
         this.props.onClose();
         this.props.refresh();
       })
     } else {
-      fetch(`${process.env.REACT_APP_BACKEND}/v0/activities`, {
+      authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/activities`, {
         method: 'POST',
         body: JSON.stringify(data),
         headers:{
           'Content-Type': 'application/json'
         }
       })
-      .then(res => res.json())
       .then(res => {
         this.props.onClose();
         this.props.refresh();

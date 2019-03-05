@@ -6,20 +6,13 @@ import localizer from 'react-big-calendar/lib/localizers/globalize'
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop'
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css'
 import globalize from 'globalize'
-import EventWrapper from './EventWrapper'
-import Event from './Event'
+import EventWrapper from '../common/EventWrapper'
+import Event from '../common/Event'
 import AdminModal from './AdminModal'
 
 const DragAndDropCalendar = withDragAndDrop(BigCalendar)
 require('globalize/lib/cultures/globalize.culture.fr')
 const globalizeLocalizer = localizer(globalize)
-
-const defaultState = {
-  show: false,
-  events: [],
-  start: new Date(),
-  end: new Date(),
-};
 
 function convertToBigCalendarEvents(events) {
   return events.map(event => {
@@ -33,6 +26,15 @@ function convertToBigCalendarEvents(events) {
 
 class AdminCalendar extends React.Component {
 
+  defaultState() {
+    return {
+      show: false,
+      events: [],
+      start: new Date(),
+      end: new Date(),
+    };
+  }
+
   constructor(props, context) {
     super(props, context);
 
@@ -42,15 +44,14 @@ class AdminCalendar extends React.Component {
     this.onDoubleClickEvent = this.onDoubleClickEvent.bind(this);
     this.refresh = this.refresh.bind(this);
 
-    this.state = defaultState;
+    this.state = this.defaultState();
   }
 
   refresh() {
     fetch(`${process.env.REACT_APP_BACKEND}/v0/activities`)
       .then(res => res.json())
       .then(events => {
-        defaultState.events = convertToBigCalendarEvents(events);
-        this.setState({events: defaultState.events})
+        this.setState({events: convertToBigCalendarEvents(events)})
       })
   }
 
@@ -67,7 +68,7 @@ class AdminCalendar extends React.Component {
   }
 
   handleClose() {
-    this.setState(defaultState);
+    this.setState({ show: false, currentEventId: null, start: new Date(), end: new Date()});
   }
 
   handleSubmit(event) {

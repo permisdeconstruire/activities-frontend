@@ -258,27 +258,27 @@ h4 a:focus .anchor-icon {
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
 }
 
-.greenPillar .rbc-event {
+.greenPillar, .greenPillar .rbc-event {
   background-color: #41a62a;
   border: 1px solid #41a62a;
 }
 
-.purplePillar .rbc-event {
+.purplePillar, .purplePillar .rbc-event {
   background-color: #93117e;
   border: 1px solid #93117e;
 }
 
-.orangePillar .rbc-event {
+.orangePillar, .orangePillar .rbc-event {
   background-color: #eb691c;
   border: 1px solid #eb691c;
 }
 
-.bluePillar .rbc-event {
+.bluePillar, .bluePillar .rbc-event {
   background-color: #008bd0;
   border: 1px solid #008bd0;
 }
 
-.grayPillar .rbc-event {
+.grayPillar, .grayPillar .rbc-event {
   background-color: #858585;
   border: 1px solid #858585;
 }
@@ -306,4 +306,12 @@ h4 a:focus .anchor-icon {
   text-align: right;
   font-style: italic;
   font-size: 12px;
+}
+
+.pedagogyRow {
+  line-height: 3em;
+}
+
+.is-registered-true .rbc-event {
+  border: 2px solid black;
 }
