@@ -15,7 +15,7 @@ import {
 import DatePicker from 'react-datepicker'
 import { registerLocale }  from 'react-datepicker'
 import fr from 'date-fns/locale/fr';
-import {authFetch} from '../common/utils'
+import {authFetch, colorPillar} from '../common/utils'
 registerLocale('fr', fr);
 
 const dateFormat = 'dd/MM/YYYY HH:mm'
@@ -49,7 +49,6 @@ class PiloteModal extends React.Component {
       if(typeof(event) !== 'undefined') {
         const newState = this.defaultState();
         newState.pedagogy = JSON.parse(JSON.stringify(event.pedagogy));
-        newState.pedagogy[0].visible = true;
         this.setState(newState);
       }
     }
@@ -61,9 +60,7 @@ class PiloteModal extends React.Component {
       newPedagogy[index].checked = false;
     }
     newPedagogy[index].checked = !newPedagogy[index].checked;
-    if(newPedagogy.length > index + 1){
-      newPedagogy[index + 1].visible = true;
-    }
+
     this.setState({pedagogy: newPedagogy});
   }
 
@@ -151,19 +148,37 @@ class PiloteModal extends React.Component {
     } else if(this.state.step === 1) {
       stepPanel = (
         <Panel>
-          <Panel.Heading>Compétences développées</Panel.Heading>
+          <Panel.Heading>Je souhaite travailler les compétences suivantes</Panel.Heading>
           <Panel.Body>
             <Form horizontal>
               {
-                this.state.pedagogy.filter(pedagogy => pedagogy.visible).map((pedagogy, index) => (
-                  <Row className='pedagogyRow' key={index}>
-                    <Col sm={9}>
-                      {`${pedagogy.rubric} ${pedagogy.skill}`}
+                this.state.pedagogy.map((pedagogy, index) => (
+                  <>
+                  <Row title={pedagogy.pillar} className={`pedagogyRow`} key={index}>
+                    <Col sm={12} style={({textAlign:'center'})}>
+                      {`${pedagogy.objective}`}
                     </Col>
-                    <Col sm={1}>
-                      <Button bsStyle={pedagogy.checked ? 'success' : 'default'} onClick={this.handleCheckPedagogy.bind(this, index)}>J'ai compris</Button>
+                    <Col sm={5} style={({fontWeight:'bold'})} className={colorPillar(pedagogy.pillar)}>
+                      Pillier {pedagogy.pillar}
+                    </Col>
+                    <Col sm={5}>
+                    {
+                      Array.apply(null, {length: pedagogy.level}).map(k => (
+                        <span class="fa fa-star starChecked"></span>
+                      ))
+                    }
+                    {
+                      Array.apply(null, {length: (4-pedagogy.level)}).map(k => (
+                        <span class="fa fa-star"></span>
+                      ))
+                    }
+                    </Col>
+                    <Col sm={2}>
+                      <Button bsStyle={pedagogy.checked ? 'success' : 'default'} onClick={this.handleCheckPedagogy.bind(this, index)}>OK</Button>
                     </Col>
                   </Row>
+                  <hr />
+                  </>
                 ))
               }
             </Form>
@@ -183,7 +198,7 @@ class PiloteModal extends React.Component {
       )
     }
 
-    const allChecked = _.every(this.state.pedagogy, {checked: true})
+    const allChecked = _.some(this.state.pedagogy, {checked: true})
     return (
       <Modal show={this.props.show} onHide={this.props.onClose}>
         <Modal.Header closeButton >

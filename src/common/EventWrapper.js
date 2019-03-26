@@ -1,11 +1,11 @@
 import React from 'react'
-import {colorPillar} from './utils'
+import {colorActivity} from './utils'
 
 class EventWrapper extends React.Component {
 
   render(){
     return (
-      <div className={`${colorPillar(this.props.event.pillar)} is-registered-${this.props.event.isRegistered}`}>
+      <div className={`${colorActivity(this.props.event.status)} is-registered-${this.props.event.isRegistered}`}>
         {this.props.children}
       </div>
     );

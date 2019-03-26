@@ -12,16 +12,7 @@ import {
   ControlLabel,
   FormControl,
 } from 'react-bootstrap';
-import {authFetch} from '../common/utils'
-
-
-const pillars = [
-  'Fermeture',
-  'Bien vivre',
-  'Bien-être psychologique',
-  'Bien-être corporel',
-  'Bien faire',
-]
+import {authFetch, listPedagogy} from '../common/utils'
 
 function getSuggestionValue(suggestion) {
   return suggestion
@@ -64,13 +55,12 @@ class AdminPedagogy extends React.Component {
   }
 
   updatePedagogy() {
-    fetch(`${process.env.REACT_APP_BACKEND}/v0/pedagogy`)
-    .then(res => res.json())
-    .then(res => {
-      const newState = this.defaultState();
-      newState.pedagogy = res;
-      this.setState(newState)
-    })
+    listPedagogy()
+      .then(res => {
+        const newState = this.defaultState();
+        newState.pedagogy = res;
+        this.setState(newState)
+      })
   }
 
   componentDidMount() {

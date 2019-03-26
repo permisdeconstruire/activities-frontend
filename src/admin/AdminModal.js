@@ -15,20 +15,29 @@ import {
 import DatePicker from 'react-datepicker'
 import { registerLocale }  from 'react-datepicker'
 import fr from 'date-fns/locale/fr';
-import {authFetch} from '../common/utils'
+import {authFetch, listPedagogy} from '../common/utils'
 registerLocale('fr', fr);
 
 const dateFormat = 'dd/MM/YYYY HH:mm'
 
 const skills = require('../common/skills.json')
 
-const pillars = [
+const status = [
   'Fermeture',
+  'Rendez-vous',
+  'Autonomie',
+  'Socio-éducatif',
+  'Formative',
+  'Individuelle',
+]
+
+const pillars = [
   'Bien vivre',
   'Bien-être psychologique',
   'Bien-être corporel',
   'Bien faire',
 ]
+
 
 function getSuggestionValue(suggestion) {
   return suggestion
@@ -50,10 +59,11 @@ class AdminModal extends React.Component {
       id: '',
       start: new Date(),
       end: new Date(),
-      pillar: pillars[0],
+      status: status[0],
       theme: '',
       contributor: '',
       pedagogy: [],
+      allPedagogy: [],
       cost: 0,
       estimated: 0,
       place: '',
@@ -61,7 +71,11 @@ class AdminModal extends React.Component {
       copilot: '',
       step:0,
       copyActivity: 'none',
-      themeSuggestions: []
+      suggestions: {
+        category: [],
+        subCategory: [],
+        theme: [],
+      },
     };
   }
 
@@ -79,22 +93,19 @@ class AdminModal extends React.Component {
     this.copyActivity = this.copyActivity.bind(this);
     this.onSuggestionsFetchRequested = this.onSuggestionsFetchRequested.bind(this);
     this.onSuggestionsClearRequested = this.onSuggestionsClearRequested.bind(this);
-    this.handleChangeTheme = this.handleChangeTheme.bind(this);
+    this.handleChangeSuggestion = this.handleChangeSuggestion.bind(this);
     this.getSuggestions = this.getSuggestions.bind(this);
     this.state = this.defaultState();
   }
 
-  getSuggestions(value) {
-    const themes = _.uniqBy(this.props.events, 'theme').map(event => event.theme)
-
-    const inputValue = value.trim().toLowerCase();
-    const inputLength = inputValue.length;
-
-    return inputLength === 0 ? [] : themes.filter(theme =>
-      theme.toLowerCase().slice(0, inputLength) === inputValue
-    );
+  componentDidMount() {
+    listPedagogy()
+      .then(res => {
+        const newState = this.state;
+        newState.allPedagogy = res;
+        this.setState(newState)
+      })
   }
-
 
   componentDidUpdate(prevProps, prevState) {
     if(prevProps.currentEventId !== this.props.currentEventId || prevProps.start.toString() !== this.props.start.toString() || prevProps.end.toString() !== this.props.end.toString()) {
@@ -119,7 +130,7 @@ class AdminModal extends React.Component {
 
       const activity = this.props.events.find(activity => activity.id === event.target.value)
       newState.title = activity.title;
-      newState.pillar = activity.pillar;
+      newState.status = activity.status;
       newState.theme = activity.theme;
       newState.contributor = activity.contributor;
       newState.pedagogy = activity.pedagogy;
@@ -140,7 +151,7 @@ class AdminModal extends React.Component {
 
   addPedagogy() {
     const newState = this.state;
-    newState.pedagogy.push({rubric: skills[0].rubric, skill: skills[0].titles[0]})
+    newState.pedagogy.push({category: '', subCategory: '', objective: ''})
     this.setState(newState)
   }
 
@@ -162,10 +173,16 @@ class AdminModal extends React.Component {
     this.setState(newState);
   }
 
-  handleChangeTheme(event, { newValue }) {
-    this.setState({
-      theme: newValue
-    });
+  handleChangeSuggestion({index, field}, event, { newValue }) {
+    const newState = {}
+    if(typeof(index) === 'undefined') {
+      newState[field] = newValue
+    } else {
+      newState.pedagogy = this.state.pedagogy;
+      newState.pedagogy[index][field] = newValue
+    }
+
+    this.setState(newState);
   }
 
   handleDelete() {
@@ -181,16 +198,35 @@ class AdminModal extends React.Component {
     }
   }
 
-  onSuggestionsFetchRequested({ value }){
-    this.setState({
-      themeSuggestions: this.getSuggestions(value)
-    });
+  getSuggestions(field, index, value) {
+    let suggestions;
+    if(field === 'subCategory') {
+      suggestions = _.uniqBy(this.state.allPedagogy.filter(pedagogy => pedagogy.category === this.state.pedagogy[index].category), field).map(pedagogy => pedagogy[field])
+    } else if(field === 'category') {
+      suggestions = _.uniqBy(this.state.allPedagogy, field).map(pedagogy => pedagogy[field])
+    } else if(field === 'theme') {
+      suggestions = _.uniqBy(this.props.events, 'theme').map(event => event.theme)
+    }
+
+    const inputValue = value.trim().toLowerCase();
+    const inputLength = inputValue.length;
+
+    return inputLength === 0 ? [] : suggestions.filter(theme =>
+      theme.toLowerCase().slice(0, inputLength) === inputValue
+    );
   }
 
-  onSuggestionsClearRequested(){
-    this.setState({
-      themeSuggestions: []
-    });
+  onSuggestionsFetchRequested({field, index}, { value }){
+    const newState = {suggestions: this.state.suggestions}
+    newState.suggestions[field] = this.getSuggestions(field, index, value)
+    console.log(field, newState.suggestions[field])
+    this.setState(newState);
+  }
+
+  onSuggestionsClearRequested(field){
+    const newState = {suggestions: this.state.suggestions}
+    newState.suggestions[field] = []
+    this.setState(newState);
   }
 
   handleSubmit(event) {
@@ -199,7 +235,7 @@ class AdminModal extends React.Component {
       title: this.state.title,
       start: this.state.start,
       end: this.state.end,
-      pillar: this.state.pillar,
+      status: this.state.status,
       theme: this.state.theme,
       contributor: this.state.contributor,
       pedagogy: this.state.pedagogy,
@@ -258,7 +294,7 @@ class AdminModal extends React.Component {
                 Copier ancienne activité
               </Col>
               <Col sm={8}>
-                <FormControl onChange={this.copyActivity} value={this.state.copyActivity} componentClass="select" placeholder={pillars[0]}>
+                <FormControl onChange={this.copyActivity} value={this.state.copyActivity} componentClass="select">
                   <option key="none" value="none">-- Partir de zéro --</option>
                   {_.uniqBy(this.props.events, 'theme').map((event) => <option key={event.id} value={event.id}>{event.theme}</option>)}
                 </FormControl>
@@ -275,13 +311,13 @@ class AdminModal extends React.Component {
                       <FormControl value={this.state.title} onChange={this.handleChange.bind(this, 'title')} type="text" placeholder="Nouvelle activité" />
                     </Col>
                   </FormGroup>
-                  <FormGroup controlId="formHorizontalPillarAndTheme">
+                  <FormGroup controlId="formHorizontalStatusAndTheme">
                     <Col componentClass={ControlLabel} sm={2}>
-                      Pilier
+                      Status
                     </Col>
                     <Col sm={4}>
-                      <FormControl onChange={this.handleChange.bind(this, 'pillar')} value={this.state.pillar} componentClass="select" placeholder={pillars[0]}>
-                        {pillars.map((pillar) => <option key={pillar} value={pillar}>{pillar}</option>)}
+                      <FormControl onChange={this.handleChange.bind(this, 'status')} value={this.state.status} componentClass="select">
+                        {status.map((status) => <option key={status} value={status}>{status}</option>)}
                       </FormControl>
                     </Col>
 
@@ -290,12 +326,12 @@ class AdminModal extends React.Component {
                     </Col>
                     <Col sm={4}>
                       <Autosuggest
-                        suggestions={this.state.themeSuggestions}
-                        onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
-                        onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+                        suggestions={this.state.suggestions.theme}
+                        onSuggestionsFetchRequested={this.onSuggestionsFetchRequested.bind(this, {field: 'theme'})}
+                        onSuggestionsClearRequested={this.onSuggestionsClearRequested.bind(this, 'theme')}
                         getSuggestionValue={getSuggestionValue}
                         renderSuggestion={renderSuggestion}
-                        inputProps={({placeholder: 'Visite entreprise', value: this.state.theme, onChange: this.handleChangeTheme})}
+                        inputProps={({placeholder: 'Visite entreprise', value: this.state.theme, onChange: this.handleChangeSuggestion.bind(this, {field: 'theme'})})}
                       />
                     </Col>
                   </FormGroup>
@@ -404,28 +440,54 @@ class AdminModal extends React.Component {
                 <Panel.Heading>Pédagogie</Panel.Heading>
                 <Panel.Body>
                   {this.state.pedagogy.map((pedagogy, index) =>
-                    <div key={pedagogy.rubric+pedagogy.skill+index}>
-                    <FormGroup controlId="formHorizontalPedagogyRubric">
-                      <Col componentClass={ControlLabel} sm={3}>
-                        Rubrique
+                    <div key={pedagogy.category+pedagogy.subCategory+index}>
+                    <FormGroup controlId="formHorizontalPedagogyCategory">
+                      <Col sm={6}>
+                        <FormControl onChange={this.handleChangePedagogy.bind(this, index, 'category')} value={pedagogy.category} componentClass="select">
+                          <option key="none" value="none">-- Domaine --</option>
+                          {_.uniqBy(this.state.allPedagogy, 'category').map((p, j) => <option key={`category-${j}`} value={p.category}>{p.category}</option>)}
+                        </FormControl>
                       </Col>
-                      <Col sm={9}>
-                        <FormControl onChange={this.handleChangePedagogy.bind(this, index, 'rubric')} value={pedagogy.rubric} componentClass="select" placeholder={skills[0].rubric}>
-                          {skills.map(({rubric}) => <option key={rubric+index} value={rubric}>{rubric}</option>)}
+                      <Col sm={6}>
+                        <FormControl onChange={this.handleChangePedagogy.bind(this, index, 'subCategory')} value={pedagogy.subCategory} componentClass="select">
+                          <option key="none" value="none">-- Sous-domaine --</option>
+                          {_.uniqBy(this.state.allPedagogy.filter(p => p.category === pedagogy.category), 'subCategory').map((p, j) => <option key={`subCategory-${j}`} value={p.subCategory}>{p.subCategory}</option>)}
                         </FormControl>
                       </Col>
                     </FormGroup>
-                    <FormGroup controlId="formHorizontalPedagogySkill">
-                      <Col componentClass={ControlLabel} sm={3}>
-                        Compétence
-                      </Col>
-                      <Col sm={8}>
-                        <FormControl onChange={this.handleChangePedagogy.bind(this, index, 'skill')} value={pedagogy.skill} componentClass="select" placeholder={skills[0].titles[0]}>
-                          {skills.find(({rubric}) => rubric === pedagogy.rubric).titles.map(skill => <option key={pedagogy.rubric+skill+index} value={skill}>{skill}</option>)}
+                    <FormGroup controlId="formHorizontalPedagogyObjective">
+                      <Col sm={12}>
+                        <FormControl onChange={this.handleChangePedagogy.bind(this, index, 'objective')} value={pedagogy.objective} componentClass="select">
+                          <option key="none" value="none">-- Objectif --</option>
+                          {_.uniqBy(this.state.allPedagogy.filter(p => p.category === pedagogy.category && p.subCategory === pedagogy.subCategory), 'objective').map((p, j) => <option key={`objective-${j}`} value={p.objective}>{p.objective}</option>)}
                         </FormControl>
                       </Col>
+                    </FormGroup>
+                    <FormGroup style={({textAlign:'center'})}>
                       <Col sm={0}>
-                        <Button bsStyle="danger" onClick={this.deletePedagogy.bind(this, index)}>-</Button>
+                        Lier l'objectif
+                      </Col>
+                    </FormGroup>
+                    <FormGroup controlId="formHorizontalPedagogyPillar">
+                      <Col sm={6}>
+                        <FormControl onChange={this.handleChangePedagogy.bind(this, index, 'pillar')} value={pedagogy.pillar} componentClass="select">
+                          <option key="none" value="none">-- Pillier --</option>
+                          {pillars.map(pillar => <option key={pillar} value={pillar}>{pillar}</option>)}
+                        </FormControl>
+                      </Col>
+                      <Col sm={6}>
+                        <FormControl onChange={this.handleChangePedagogy.bind(this, index, 'level')} value={pedagogy.level} componentClass="select">
+                          <option key="none" value="none">-- Niveau --</option>
+                          <option key="level-1" value="1">1) Découvrir</option>
+                          <option key="level-2" value="2">2) Comprendre</option>
+                          <option key="level-3" value="3">3) Choisir</option>
+                          <option key="level-4" value="4">4) Réaliser</option>
+                        </FormControl>
+                      </Col>
+                    </FormGroup>
+                    <FormGroup style={({textAlign:'center'})}>
+                      <Col sm={0}>
+                        <Button bsStyle="danger" onClick={this.deletePedagogy.bind(this, index)}>Supprimer</Button>
                       </Col>
                     </FormGroup>
                     <hr/>

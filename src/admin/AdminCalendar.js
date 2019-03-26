@@ -41,7 +41,7 @@ class AdminCalendar extends React.Component {
     this.handleClose = this.handleClose.bind(this);
     this.onSelectSlot = this.onSelectSlot.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.onDoubleClickEvent = this.onDoubleClickEvent.bind(this);
+    this.onSelectEvent = this.onSelectEvent.bind(this);
     this.refresh = this.refresh.bind(this);
 
     this.state = this.defaultState();
@@ -63,7 +63,7 @@ class AdminCalendar extends React.Component {
     this.setState({ show: true, start: slotInfo.start, end: slotInfo.end, currentEventId: '' });
   }
 
-  onDoubleClickEvent(event) {
+  onSelectEvent(event) {
     this.setState({ show: true, currentEventId: event.id});
   }
 
@@ -77,7 +77,7 @@ class AdminCalendar extends React.Component {
       title: event.event.title,
       start: event.start,
       end: event.end,
-      pillar: event.event.pillar,
+      status: event.event.status,
       theme: event.event.theme,
       contributor: event.event.contributor,
       pedagogy: event.event.pedagogy,
@@ -123,7 +123,7 @@ class AdminCalendar extends React.Component {
           components={({event: Event, eventWrapper: EventWrapper})}
           selectable='ignoreEvents'
           onSelectSlot={this.onSelectSlot}
-          onDoubleClickEvent={this.onDoubleClickEvent}
+          onSelectEvent={this.onSelectEvent}
           min={moment().startOf('day').add(9, 'hours').toDate()}
           max={moment().startOf('day').add(17, 'hours').toDate()}
           localizer={globalizeLocalizer}

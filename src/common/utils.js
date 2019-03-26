@@ -1,17 +1,30 @@
-function colorPillar(pillar) {
-  if(pillar === 'Bien vivre') {
-    return 'greenPillar'
-  } else if (pillar === 'Bien-être psychologique') {
-    return 'purplePillar'
-  } else if (pillar === 'Bien-être corporel') {
-    return 'orangePillar'
-  } else if (pillar === 'Bien faire') {
-    return 'bluePillar'
-  } else if (pillar === 'Fermeture') {
-    return 'grayPillar'
+function colorActivity(status) {
+  if(status === 'Rendez-vous') {
+    return 'orangeActivity'
+  } else if (status === 'Autonomie') {
+    return 'purpleActivity'
+  } else if (status === 'Socio-éducatif') {
+    return 'greenActivity'
+  } else if (status === 'Formative') {
+    return 'greenActivity'
+  } else if (status === 'Individuelle') {
+    return 'blueActivity'
+  } else if (status === 'Fermeture') {
+    return 'grayActivity'
   }
 }
 
+function colorPillar(pillar) {
+  if(pillar === 'Bien vivre') {
+    return 'orangePillar'
+  } else if (pillar === 'Bien-être psychologique') {
+    return 'purplePillar'
+  } else if (pillar === 'Bien-être corporel') {
+    return 'bluePillar'
+  } else if (pillar === 'Bien faire') {
+    return 'greenPillar'
+  }
+}
 
 function authFetch(url, options = {headers: {}}) {
   const newJwt = document.location.search.split('token=')[1];
@@ -35,7 +48,14 @@ function authFetch(url, options = {headers: {}}) {
     })
 }
 
+function listPedagogy() {
+  return fetch(`${process.env.REACT_APP_BACKEND}/v0/pedagogy`)
+    .then(res => res.json())
+}
+
 module.exports = {
   colorPillar,
+  colorActivity,
   authFetch,
+  listPedagogy,
 }

@@ -258,27 +258,27 @@ h4 a:focus .anchor-icon {
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
 }
 
-.greenPillar, .greenPillar .rbc-event {
+.greenActivity, .greenActivity .rbc-event {
   background-color: #41a62a;
   border: 1px solid #41a62a;
 }
 
-.purplePillar, .purplePillar .rbc-event {
+.purpleActivity, .purpleActivity .rbc-event {
   background-color: #93117e;
   border: 1px solid #93117e;
 }
 
-.orangePillar, .orangePillar .rbc-event {
+.orangeActivity, .orangeActivity .rbc-event {
   background-color: #eb691c;
   border: 1px solid #eb691c;
 }
 
-.bluePillar, .bluePillar .rbc-event {
+.blueActivity, .blueActivity .rbc-event {
   background-color: #008bd0;
   border: 1px solid #008bd0;
 }
 
-.grayPillar, .grayPillar .rbc-event {
+.grayActivity, .grayActivity .rbc-event {
   background-color: #858585;
   border: 1px solid #858585;
 }
@@ -346,4 +346,24 @@ h4 a:focus .anchor-icon {
 
 .rowPedagogy{
   margin-bottom: 20px;
+}
+
+.starChecked {
+  color: orange;
+}
+
+.greenPillar {
+  color: #41a62a;
+}
+
+.purplePillar {
+  color: #93117e;
+}
+
+.orangePillar {
+  color: #eb691c;
+}
+
+.bluePillar {
+  color: #008bd0;
 }
