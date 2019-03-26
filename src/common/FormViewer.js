@@ -19,6 +19,15 @@ require('jquery-ui-sortable');
 require('formBuilder/dist/form-render.min');
 
 
+function downloadURI(uri, name) {
+  const link = document.createElement("a");
+  link.download = name;
+  link.href = uri;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
 class FormViewer extends React.Component {
 
   defaultState() {
@@ -48,15 +57,50 @@ class FormViewer extends React.Component {
     const newUserData = this.state.form.userData;
 
     newUserData.forEach(newUserDatum => {
-      if(typeof(datum) !== 'undefined' && typeof(datum[newUserDatum.name]) !== 'undefined') {
-        newUserDatum.userData[0] = datum[newUserDatum.name];
-      } else {
-        newUserDatum.userData[0] = '';
+      if(typeof(newUserDatum.name) !== 'undefined') {
+        if(typeof(datum) !== 'undefined' && typeof(datum[newUserDatum.name]) !== 'undefined') {
+          if(newUserDatum.type === 'checkbox-group') {
+            newUserDatum.userData = datum[newUserDatum.name];
+          } else if (newUserDatum.type === 'file') {
+
+          } else {
+            newUserDatum.userData = [datum[newUserDatum.name]];
+          }
+        } else {
+          if(newUserDatum.type === 'checkbox-group') {
+            newUserDatum.userData = [];
+          } else {
+            newUserDatum.userData = [''];
+          }
+        }
       }
     })
     const form = $(this.fv.current).formRender({
       formData: newUserData
     });
+    if(typeof(datum) !== 'undefined') {
+      const fileData = form.userData.filter(formLine => formLine.type === 'file');
+      fileData.forEach(fileDatum => {
+        const parent = $(this.state.form.instanceContainers[0]).find(`input[name="${fileDatum.name}"]`).parent()
+        const divUploadedFile = $('<div class="uploadedFile"></div>');
+        if(datum[fileDatum.name] !== '') {
+          const mime = datum[fileDatum.name].split(';')[0].split(':')[1];
+          let elem
+          if(mime.startsWith('image')) {
+            elem = $('<img>',{class: 'downloadable', width: '100px', src: datum[fileDatum.name]})
+          } else {
+            elem = $('<p>',{class: 'downloadable'}).text(fileDatum.name)
+          }
+          elem.click(() => {
+            downloadURI(datum[fileDatum.name], fileDatum.name);
+          })
+          divUploadedFile.append(elem);
+        }
+        // divUploadedFile.appendChild()
+        parent.append(divUploadedFile)
+      })
+    }
+
     this.setState({form, selected: event.target.value})
   }
 
@@ -72,7 +116,11 @@ class FormViewer extends React.Component {
       .then(res => {
         const newUserData = this.state.form.userData;
         newUserData.forEach(newUserDatum => {
-          newUserDatum.userData[0] = '';
+          if(newUserDatum.type === 'checkbox-group') {
+            newUserDatum.userData = [];
+          } else {
+            newUserDatum.userData = [''];
+          }
         })
         const form = $(this.fv.current).formRender({
           formData: newUserData
@@ -85,31 +133,83 @@ class FormViewer extends React.Component {
 
   handleSubmit() {
     const data = {}
-
-    this.state.form.userData.forEach(formLine => {
-      data[formLine.name] = formLine.userData[0];
-    })
     let id = this.state.selected;
-    let promiseFetch;
-    if (typeof(id) !== 'undefined' && id !== 'none') {
-      promiseFetch = authFetch(`${process.env.REACT_APP_BACKEND}/v0${this.props.api}/id/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify(data),
-        headers:{
-          'Content-Type': 'application/json'
+    const fileData = this.state.form.userData.filter(formLine => formLine.type === 'file');
+
+    const filePromises = [];
+    for(let i = 0; i < fileData.length; i += 1) {
+      filePromises.push(new Promise((resolve, reject) => {
+        const fileDatum = fileData[i];
+        const fileInput = $(this.state.form.instanceContainers[0]).find(`input[name="${fileDatum.name}"]`)[0];
+        if(fileInput.files.length > 0) {
+          const file = fileInput.files[0]
+          const fileReader = new FileReader();
+          fileReader.onload = (event) => {
+            const parent = $(this.state.form.instanceContainers[0]).find(`input[name="${fileDatum.name}"]`).parent()
+            let divUploadedFile;
+            if(parent.find('.uploadedFile').length === 0) {
+              divUploadedFile = $('<div class="uploadedFile"></div>');
+            } else {
+              divUploadedFile = parent.find('.uploadedFile').first();
+              divUploadedFile.empty();
+            }
+
+            const mime = event.target.result.split(';')[0].split(':')[1];
+            let elem
+            if(mime.startsWith('image')) {
+              elem = $('<img>',{class: 'downloadable', width: '100px', src: event.target.result})
+            } else {
+              elem = $('<p>',{class: 'downloadable'}).text(fileDatum.name)
+            }
+            elem.click(() => {
+              downloadURI(event.target.result, fileDatum.name);
+            })
+            divUploadedFile.append(elem);
+            parent.append(divUploadedFile)
+
+            resolve({name: fileDatum.name, data: event.target.result})
+          };
+          fileReader.readAsDataURL(file);
+        } else {
+          resolve({name: fileDatum.name, data: ''})
         }
-      })
-    } else {
-      promiseFetch = authFetch(`${process.env.REACT_APP_BACKEND}/v0${this.props.api}`, {
-        method: 'POST',
-        body: JSON.stringify(data),
-        headers:{
-          'Content-Type': 'application/json'
-        }
-      })
+      }))
     }
 
-    promiseFetch
+    Promise.all(filePromises)
+      .then(files => {
+        this.state.form.userData.filter(formLine => typeof(formLine.name) !== 'undefined').forEach(formLine => {
+          if(formLine.type === 'checkbox-group') {
+            data[formLine.name] = formLine.userData;
+            if(typeof(data[formLine.name]) === 'undefined') {
+              data[formLine.name] = [];
+            }
+          } else {
+            if(formLine.type === 'file') {
+              const file = files.find(f => f.name === formLine.name);
+              data[formLine.name] = file.data;
+            } else {
+              data[formLine.name] = formLine.userData[0];
+            }
+          }
+        })
+        if (typeof(id) !== 'undefined' && id !== 'none') {
+          return authFetch(`${process.env.REACT_APP_BACKEND}/v0${this.props.api}/id/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data),
+            headers:{
+              'Content-Type': 'application/json'
+            }
+          })
+        }
+        return authFetch(`${process.env.REACT_APP_BACKEND}/v0${this.props.api}`, {
+          method: 'POST',
+          body: JSON.stringify(data),
+          headers:{
+            'Content-Type': 'application/json'
+          }
+        })
+      })
       .then(res => {
         if(id === 'none') {
           id = res;
@@ -139,7 +239,6 @@ class FormViewer extends React.Component {
   }
 
   render() {
-    console.log(this.state.selected);
     return (
       <Row>
         <Col sm={2}>

@@ -21,6 +21,7 @@ class AdminHeader extends React.Component {
         <Row>
           <Col sm={4}><a href="/#forms">Éditer les formulaires</a></Col>
           <Col sm={4}><a href="/#pilotes">Gérer les pilotes</a></Col>
+          <Col sm={4}><a href="/#pedagogy">Gérer la pédagogie</a></Col>
         </Row>
       </div>
     );

@@ -315,3 +315,35 @@ h4 a:focus .anchor-icon {
 .is-registered-true .rbc-event {
   border: 2px solid black;
 }
+
+.uploadedFile {
+  text-align: center;
+  color: blue;
+  margin-top: 10px;
+}
+
+.downloadable {
+  cursor: pointer;
+}
+
+.react-autosuggest__suggestions-container--open{
+  position: absolute;
+  z-index:10;
+  background-color: white;
+  width: 100%;
+}
+
+.react-autosuggest__suggestions-list{
+  list-style-type: none;
+  padding-left: 3px;
+}
+
+#allPedagogy{
+  margin-left: auto;
+  margin-right: auto;
+  width: 80%;
+}
+
+.rowPedagogy{
+  margin-bottom: 20px;
+}

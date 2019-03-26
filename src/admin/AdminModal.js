@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import React from 'react'
+import Autosuggest from 'react-autosuggest';
 import {
   Modal,
   Panel,
@@ -29,11 +30,17 @@ const pillars = [
   'Bien faire',
 ]
 
-const themes = [
-  'theme 1',
-  'theme 2',
-  'theme 3',
-]
+function getSuggestionValue(suggestion) {
+  return suggestion
+};
+
+function renderSuggestion(suggestion) {
+  return (
+    <div>
+      {suggestion}
+    </div>
+  )
+}
 
 class AdminModal extends React.Component {
 
@@ -44,15 +51,17 @@ class AdminModal extends React.Component {
       start: new Date(),
       end: new Date(),
       pillar: pillars[0],
-      theme: themes[0],
+      theme: '',
       contributor: '',
       pedagogy: [],
       cost: 0,
+      estimated: 0,
       place: '',
       annotation: '',
       copilot: '',
       step:0,
-      copyActivity: 'none'
+      copyActivity: 'none',
+      themeSuggestions: []
     };
   }
 
@@ -68,8 +77,24 @@ class AdminModal extends React.Component {
     this.deletePedagogy = this.deletePedagogy.bind(this);
     this.handleChangePedagogy = this.handleChangePedagogy.bind(this);
     this.copyActivity = this.copyActivity.bind(this);
+    this.onSuggestionsFetchRequested = this.onSuggestionsFetchRequested.bind(this);
+    this.onSuggestionsClearRequested = this.onSuggestionsClearRequested.bind(this);
+    this.handleChangeTheme = this.handleChangeTheme.bind(this);
+    this.getSuggestions = this.getSuggestions.bind(this);
     this.state = this.defaultState();
   }
+
+  getSuggestions(value) {
+    const themes = _.uniqBy(this.props.events, 'theme').map(event => event.theme)
+
+    const inputValue = value.trim().toLowerCase();
+    const inputLength = inputValue.length;
+
+    return inputLength === 0 ? [] : themes.filter(theme =>
+      theme.toLowerCase().slice(0, inputLength) === inputValue
+    );
+  }
+
 
   componentDidUpdate(prevProps, prevState) {
     if(prevProps.currentEventId !== this.props.currentEventId || prevProps.start.toString() !== this.props.start.toString() || prevProps.end.toString() !== this.props.end.toString()) {
@@ -99,6 +124,7 @@ class AdminModal extends React.Component {
       newState.contributor = activity.contributor;
       newState.pedagogy = activity.pedagogy;
       newState.cost = activity.cost;
+      newState.estimated = activity.estimated;
       newState.place = activity.place;
       newState.annotation = activity.annotation;
       newState.copilot = activity.copilot;
@@ -136,6 +162,12 @@ class AdminModal extends React.Component {
     this.setState(newState);
   }
 
+  handleChangeTheme(event, { newValue }) {
+    this.setState({
+      theme: newValue
+    });
+  }
+
   handleDelete() {
     const yes = window.confirm('Etes vous certains de vouloir supprimer cet événement ?');
     if(yes) {
@@ -147,6 +179,18 @@ class AdminModal extends React.Component {
         this.props.refresh();
       })
     }
+  }
+
+  onSuggestionsFetchRequested({ value }){
+    this.setState({
+      themeSuggestions: this.getSuggestions(value)
+    });
+  }
+
+  onSuggestionsClearRequested(){
+    this.setState({
+      themeSuggestions: []
+    });
   }
 
   handleSubmit(event) {
@@ -245,21 +289,34 @@ class AdminModal extends React.Component {
                       Theme
                     </Col>
                     <Col sm={4}>
-                      <FormControl onChange={this.handleChange.bind(this, 'theme')} value={this.state.theme} componentClass="select" placeholder={themes[0]}>
-                        {themes.map((theme) => <option key={theme} value={theme}>{theme}</option>)}
-                      </FormControl>
+                      <Autosuggest
+                        suggestions={this.state.themeSuggestions}
+                        onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+                        onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+                        getSuggestionValue={getSuggestionValue}
+                        renderSuggestion={renderSuggestion}
+                        inputProps={({placeholder: 'Visite entreprise', value: this.state.theme, onChange: this.handleChangeTheme})}
+                      />
                     </Col>
                   </FormGroup>
 
-                  <FormGroup controlId="formHorizontalPlaceAndCost">
+                  <FormGroup controlId="formHorizontalPlace">
                     <Col componentClass={ControlLabel} sm={2}>
                       Lieux
                     </Col>
-                    <Col sm={6}>
+                    <Col sm={8}>
                       <FormControl onChange={this.handleChange.bind(this, 'place')} value={this.state.place} type="text" placeholder="Stade de la Beaujoire" />
                     </Col>
+                  </FormGroup>
 
-                    <Col componentClass={ControlLabel} sm={2}>
+                  <FormGroup controlId="formHorizontalCost">
+                    <Col componentClass={ControlLabel} sm={3}>
+                      Prévisionnel
+                    </Col>
+                    <Col sm={2}>
+                      <FormControl onChange={this.handleChange.bind(this, 'estimated')} value={this.state.estimated} type="text" placeholder="0" />
+                    </Col>
+                    <Col componentClass={ControlLabel} sm={3}>
                       Coût
                     </Col>
                     <Col sm={2}>
