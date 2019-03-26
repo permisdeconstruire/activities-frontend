@@ -53,6 +53,8 @@ function renderSuggestion(suggestion) {
 
 class AdminModal extends React.Component {
 
+  allPedagogy = []
+
   defaultState() {
     return {
       title: '',
@@ -63,7 +65,6 @@ class AdminModal extends React.Component {
       theme: '',
       contributor: '',
       pedagogy: [],
-      allPedagogy: [],
       cost: 0,
       estimated: 0,
       place: '',
@@ -101,9 +102,7 @@ class AdminModal extends React.Component {
   componentDidMount() {
     listPedagogy()
       .then(res => {
-        const newState = this.state;
-        newState.allPedagogy = res;
-        this.setState(newState)
+        this.allPedagogy = res;
       })
   }
 
@@ -201,9 +200,9 @@ class AdminModal extends React.Component {
   getSuggestions(field, index, value) {
     let suggestions;
     if(field === 'subCategory') {
-      suggestions = _.uniqBy(this.state.allPedagogy.filter(pedagogy => pedagogy.category === this.state.pedagogy[index].category), field).map(pedagogy => pedagogy[field])
+      suggestions = _.uniqBy(this.allPedagogy.filter(pedagogy => pedagogy.category === this.state.pedagogy[index].category), field).map(pedagogy => pedagogy[field])
     } else if(field === 'category') {
-      suggestions = _.uniqBy(this.state.allPedagogy, field).map(pedagogy => pedagogy[field])
+      suggestions = _.uniqBy(this.allPedagogy, field).map(pedagogy => pedagogy[field])
     } else if(field === 'theme') {
       suggestions = _.uniqBy(this.props.events, 'theme').map(event => event.theme)
     }
@@ -445,13 +444,13 @@ class AdminModal extends React.Component {
                       <Col sm={6}>
                         <FormControl onChange={this.handleChangePedagogy.bind(this, index, 'category')} value={pedagogy.category} componentClass="select">
                           <option key="none" value="none">-- Domaine --</option>
-                          {_.uniqBy(this.state.allPedagogy, 'category').map((p, j) => <option key={`category-${j}`} value={p.category}>{p.category}</option>)}
+                          {_.uniqBy(this.allPedagogy, 'category').map((p, j) => <option key={`category-${j}`} value={p.category}>{p.category}</option>)}
                         </FormControl>
                       </Col>
                       <Col sm={6}>
                         <FormControl onChange={this.handleChangePedagogy.bind(this, index, 'subCategory')} value={pedagogy.subCategory} componentClass="select">
                           <option key="none" value="none">-- Sous-domaine --</option>
-                          {_.uniqBy(this.state.allPedagogy.filter(p => p.category === pedagogy.category), 'subCategory').map((p, j) => <option key={`subCategory-${j}`} value={p.subCategory}>{p.subCategory}</option>)}
+                          {_.uniqBy(this.allPedagogy.filter(p => p.category === pedagogy.category), 'subCategory').map((p, j) => <option key={`subCategory-${j}`} value={p.subCategory}>{p.subCategory}</option>)}
                         </FormControl>
                       </Col>
                     </FormGroup>
@@ -459,7 +458,7 @@ class AdminModal extends React.Component {
                       <Col sm={12}>
                         <FormControl onChange={this.handleChangePedagogy.bind(this, index, 'objective')} value={pedagogy.objective} componentClass="select">
                           <option key="none" value="none">-- Objectif --</option>
-                          {_.uniqBy(this.state.allPedagogy.filter(p => p.category === pedagogy.category && p.subCategory === pedagogy.subCategory), 'objective').map((p, j) => <option key={`objective-${j}`} value={p.objective}>{p.objective}</option>)}
+                          {_.uniqBy(this.allPedagogy.filter(p => p.category === pedagogy.category && p.subCategory === pedagogy.subCategory), 'objective').map((p, j) => <option key={`objective-${j}`} value={p.objective}>{p.objective}</option>)}
                         </FormControl>
                       </Col>
                     </FormGroup>

@@ -9,6 +9,7 @@ import './styles.css'
 import './prism.css'
 import {authFetch} from './common/utils'
 import AdminCalendar from './admin/AdminCalendar'
+import AdminPedagogy from './admin/AdminPedagogy'
 import AdminHeader from './admin/AdminHeader'
 import FormsBuilder from './admin/FormsBuilder'
 import FormViewer from './common/FormViewer'
@@ -45,6 +46,8 @@ class App extends React.Component {
         element = <FormsBuilder/>
       } else if(this.state.route === '#pilotes') {
         element = <FormViewer formTitle="Pilote" api="/admin/pilotes" keyname="email"/>
+      } else if(this.state.route === '#pedagogy') {
+        element = <AdminPedagogy />
       } else {
         element = <AdminCalendar />
       }
