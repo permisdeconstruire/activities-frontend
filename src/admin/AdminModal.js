@@ -24,7 +24,6 @@ const skills = require('../common/skills.json')
 
 const status = [
   'Fermeture',
-  'Rendez-vous',
   'Autonomie',
   'Socio-éducatif',
   'Formative',
@@ -71,6 +70,7 @@ class AdminModal extends React.Component {
       annotation: '',
       copilot: '',
       step:0,
+      published: false,
       copyActivity: 'none',
       suggestions: {
         category: [],
@@ -87,6 +87,7 @@ class AdminModal extends React.Component {
     this.handleNavigation = this.handleNavigation.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleChangeDate = this.handleChangeDate.bind(this);
+    this.handleChangePublished = this.handleChangePublished.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
     this.addPedagogy = this.addPedagogy.bind(this);
     this.deletePedagogy = this.deletePedagogy.bind(this);
@@ -138,6 +139,7 @@ class AdminModal extends React.Component {
       newState.place = activity.place;
       newState.annotation = activity.annotation;
       newState.copilot = activity.copilot;
+      newState.published = false;
       this.setState(newState);
     }
   }
@@ -166,7 +168,14 @@ class AdminModal extends React.Component {
     this.setState(newState);
   }
 
+  handleChangePublished(){
+    const newState = {}
+    newState.published = !this.state.published;
+    this.setState(newState);
+  }
+
   handleChange(field, event){
+    console.log(event.target.value);
     const newState = {}
     newState[field] = event.target.value
     this.setState(newState);
@@ -239,9 +248,11 @@ class AdminModal extends React.Component {
       contributor: this.state.contributor,
       pedagogy: this.state.pedagogy,
       cost: this.state.cost,
+      estimated: this.state.estimated,
       place: this.state.place,
       annotation: this.state.annotation,
       copilot: this.state.copilot,
+      published: this.state.published,
     }
 
     if(id !== '') {
@@ -302,7 +313,16 @@ class AdminModal extends React.Component {
               <Panel>
                 <Panel.Heading>Informations</Panel.Heading>
                 <Panel.Body>
+                  <FormGroup controlId="formHorizontalPublshed">
+                    <Col componentClass={ControlLabel} sm={2}>
+                      Publier
+                    </Col>
+                    <Col componentClass={ControlLabel} sm={10} style={({textAlign: 'left'})}>
+                      <input type="checkbox" className="btn-sm" checked={this.state.published ? 'checked' : ''} onChange={this.handleChangePublished}/>
+                    </Col>
+                  </FormGroup>
                   <FormGroup controlId="formHorizontalTitle">
+
                     <Col componentClass={ControlLabel} sm={2}>
                       Titre
                     </Col>

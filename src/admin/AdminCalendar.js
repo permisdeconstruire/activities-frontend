@@ -7,8 +7,10 @@ import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop'
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css'
 import globalize from 'globalize'
 import EventWrapper from '../common/EventWrapper'
+import TimeSlotWrapper from '../common/TimeSlotWrapper'
 import Event from '../common/Event'
 import AdminModal from './AdminModal'
+import {authFetch} from '../common/utils'
 
 const DragAndDropCalendar = withDragAndDrop(BigCalendar)
 require('globalize/lib/cultures/globalize.culture.fr')
@@ -48,8 +50,7 @@ class AdminCalendar extends React.Component {
   }
 
   refresh() {
-    fetch(`${process.env.REACT_APP_BACKEND}/v0/activities`)
-      .then(res => res.json())
+    authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/activities`)
       .then(events => {
         this.setState({events: convertToBigCalendarEvents(events)})
       })
@@ -88,14 +89,13 @@ class AdminCalendar extends React.Component {
     }
 
 
-    fetch(`${process.env.REACT_APP_BACKEND}/v0/activities/id/${id}`, {
+    authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/activities/id/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
       headers:{
         'Content-Type': 'application/json'
       }
     })
-    .then(res => res.json())
     .then(res => {
       this.handleClose();
       this.componentDidMount();
@@ -120,7 +120,7 @@ class AdminCalendar extends React.Component {
           views={['work_week']}
           defaultView='work_week'
           culture='fr'
-          components={({event: Event, eventWrapper: EventWrapper})}
+          components={({timeSlotWrapper: TimeSlotWrapper, event: Event, eventWrapper: EventWrapper})}
           selectable='ignoreEvents'
           onSelectSlot={this.onSelectSlot}
           onSelectEvent={this.onSelectEvent}

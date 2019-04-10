@@ -1,8 +1,6 @@
 function colorActivity(status) {
-  if(status === 'Rendez-vous') {
+  if (status === 'Autonomie') {
     return 'orangeActivity'
-  } else if (status === 'Autonomie') {
-    return 'purpleActivity'
   } else if (status === 'Socio-éducatif') {
     return 'greenActivity'
   } else if (status === 'Formative') {

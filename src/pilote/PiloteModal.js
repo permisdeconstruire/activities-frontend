@@ -159,17 +159,12 @@ class PiloteModal extends React.Component {
                       {`${pedagogy.objective}`}
                     </Col>
                     <Col sm={5} style={({fontWeight:'bold'})} className={colorPillar(pedagogy.pillar)}>
-                      Pillier {pedagogy.pillar}
+                      {pedagogy.pillar}
                     </Col>
                     <Col sm={5}>
                     {
                       Array.apply(null, {length: pedagogy.level}).map(k => (
                         <span class="fa fa-star starChecked"></span>
-                      ))
-                    }
-                    {
-                      Array.apply(null, {length: (4-pedagogy.level)}).map(k => (
-                        <span class="fa fa-star"></span>
                       ))
                     }
                     </Col>

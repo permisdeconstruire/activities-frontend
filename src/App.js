@@ -1,1 +1,1 @@
-AppPilote.js
+AppAdmin.js

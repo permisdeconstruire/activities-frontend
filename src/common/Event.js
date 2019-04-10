@@ -3,6 +3,23 @@ import React from 'react'
 class Event extends React.Component {
 
   render(){
+    if(this.props.event.status === 'Fermeture') {
+      return (
+        <>
+          <div className='event-title' style={({textAlign:'center'})}>Fermeture</div>
+          {this.props.event.title !== '' &&
+            <div className='event-title' style={({fontStyle: 'italic', marginTop:'3px', textAlign:'center'})}>{this.props.event.title}</div>
+          }
+        </>
+      )
+    }
+
+    if(this.props.event.status === 'Autonomie') {
+      return (
+        <div className='event-title' style={({textAlign:'center'})}>Autonomie</div>
+      )
+    }
+
     return (
       <>
         <div className='event-title'>{this.props.event.title} - {this.props.event.theme}</div>

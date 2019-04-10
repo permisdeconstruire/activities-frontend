@@ -6,6 +6,7 @@ import localizer from 'react-big-calendar/lib/localizers/globalize'
 import globalize from 'globalize'
 import EventWrapper from '../common/EventWrapper'
 import Event from '../common/Event'
+import TimeSlotWrapper from '../common/TimeSlotWrapper'
 import PiloteModal from './PiloteModal'
 
 require('globalize/lib/cultures/globalize.culture.fr')
@@ -60,7 +61,9 @@ class PiloteCalendar extends React.Component {
   }
 
   onSelectEvent(event) {
-    this.setState({ show: true, currentEventId: event.id});
+    if(event.status !== 'Fermeture' && event.status !== 'Autonomie') {
+      this.setState({ show: true, currentEventId: event.id});
+    }
   }
 
   handleClose() {
@@ -85,7 +88,7 @@ class PiloteCalendar extends React.Component {
           views={['work_week']}
           defaultView='work_week'
           culture='fr'
-          components={({event: Event, eventWrapper: EventWrapper})}
+          components={({timeSlotWrapper: TimeSlotWrapper, event: Event, eventWrapper: EventWrapper})}
           selectable={false}
           onSelectEvent={this.onSelectEvent}
           min={moment().startOf('day').add(9, 'hours').toDate()}

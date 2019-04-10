@@ -78,6 +78,10 @@ class AdminPedagogy extends React.Component {
     const inputValue = value.trim().toLowerCase();
     const inputLength = inputValue.length;
 
+    if(inputValue === '*') {
+      return suggestions;
+    }
+
     return inputLength === 0 ? [] : suggestions.filter(theme =>
       theme.toLowerCase().slice(0, inputLength) === inputValue
     );
