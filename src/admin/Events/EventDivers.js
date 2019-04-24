@@ -13,7 +13,7 @@ import {
   FormControl,
 } from 'react-bootstrap';
 
-class EventCourrier extends React.Component {
+class EventDivers extends React.Component {
   defaultState() {
     return {
     };
@@ -26,7 +26,7 @@ class EventCourrier extends React.Component {
   }
 
   handleChange(event) {
-    this.props.onChange({status: event.target.value})
+    this.props.onChange({title: event.target.value})
   }
 
   render() {
@@ -34,13 +34,10 @@ class EventCourrier extends React.Component {
       <>
         <FormGroup controlId="formHorizontalEventCourrier">
           <Col componentClass={ControlLabel} sm={4}>
-            Type de courrier
+            Titre
           </Col>
           <Col sm={6}>
-            <FormControl onChange={this.handleChange} value={this.props.data.status} componentClass="select">
-              <option key="relance" value="relance">Relance</option>
-              <option key="fin" value="fin">Fin</option>
-            </FormControl>
+            <FormControl value={this.props.data.title} onChange={this.handleChange} type="text" placeholder="Il s'est passé quelque chose" />
           </Col>
         </FormGroup>
       </>
@@ -49,4 +46,4 @@ class EventCourrier extends React.Component {
   }
 }
 
-export default EventCourrier
+export default EventDivers

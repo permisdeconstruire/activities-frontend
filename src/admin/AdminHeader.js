@@ -19,9 +19,10 @@ class AdminHeader extends React.Component {
           Bonjour {this.props.whoami.user.email}, bienvenue chez Permis de Construire.
         </Row>
         <Row>
-          <Col sm={4}><a href="/#forms">Éditer les formulaires</a></Col>
-          <Col sm={4}><a href="/#pilotes">Gérer les pilotes</a></Col>
-          <Col sm={4}><a href="/#pedagogy">Gérer la pédagogie</a></Col>
+          <Col sm={3}><a href="/#pilotes">Gérer les pilotes</a></Col>
+          <Col sm={3}><a href="/#event">Générer un événement</a></Col>
+          <Col sm={3}><a href="/#pedagogy">Gérer la pédagogie</a></Col>
+          <Col sm={3}><a href="/#forms">Éditer les formulaires</a></Col>
         </Row>
       </div>
     );

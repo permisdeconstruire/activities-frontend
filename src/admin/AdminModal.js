@@ -16,6 +16,7 @@ import DatePicker from 'react-datepicker'
 import { registerLocale }  from 'react-datepicker'
 import fr from 'date-fns/locale/fr';
 import {authFetch, listPedagogy} from '../common/utils'
+import Pedagogy from '../common/Pedagogy'
 registerLocale('fr', fr);
 
 const dateFormat = 'dd/MM/YYYY HH:mm'
@@ -95,7 +96,6 @@ class AdminModal extends React.Component {
   componentDidMount() {
     listPedagogy()
       .then(res => {
-        console.log(res);
         this.allPedagogy = res;
       })
   }
@@ -149,9 +149,9 @@ class AdminModal extends React.Component {
     this.setState(newState)
   }
 
-  handleChangePedagogy(index, field, event) {
+  handleChangePedagogy(index, peda) {
     const newPedagogy = this.state.pedagogy;
-    newPedagogy[index][field] = event.target.value;
+    newPedagogy[index] = peda;
     this.setState({pedagogy: newPedagogy})
   }
 
@@ -168,7 +168,6 @@ class AdminModal extends React.Component {
   }
 
   handleChange(field, event){
-    console.log(event.target.value);
     const newState = {}
     newState[field] = event.target.value
     this.setState(newState);
@@ -464,59 +463,13 @@ class AdminModal extends React.Component {
                 <Panel.Body>
                   {this.state.pedagogy.map((pedagogy, index) =>
                     <div key={pedagogy.category+pedagogy.level+pedagogy.subCategory+index}>
-                    <FormGroup controlId="formHorizontalPedagogyLevel">
-                      <Col componentClass={ControlLabel} sm={4}>
-                        Niveau
-                      </Col>
-                      <Col sm={6}>
-                        <FormControl onChange={this.handleChangePedagogy.bind(this, index, 'level')} value={pedagogy.level} componentClass="select">
-                          <option key="none" value="none">-- Niveau --</option>
-                          <option key="level-1" value="1">1) Découvrir</option>
-                          <option key="level-2" value="2">2) Comprendre</option>
-                          <option key="level-3" value="3">3) Choisir</option>
-                          <option key="level-4" value="4">4) Réaliser</option>
-                        </FormControl>
-                      </Col>
-                    </FormGroup>
-                    <FormGroup controlId="formHorizontalPedagogyCategory">
-                      <Col sm={6}>
-                        <FormControl onChange={this.handleChangePedagogy.bind(this, index, 'category')} value={pedagogy.category} componentClass="select">
-                          <option key="none" value="none">-- Domaine --</option>
-                          {_.uniqBy(this.allPedagogy.filter(p => p.level == pedagogy.level), 'category').map((p, j) => <option key={`category-${j}`} value={p.category}>{p.category}</option>)}
-                        </FormControl>
-                      </Col>
-                      <Col sm={6}>
-                        <FormControl onChange={this.handleChangePedagogy.bind(this, index, 'subCategory')} value={pedagogy.subCategory} componentClass="select">
-                          <option key="none" value="none">-- Sous-domaine --</option>
-                          {_.uniqBy(this.allPedagogy.filter(p => p.level == pedagogy.level && p.category === pedagogy.category), 'subCategory').map((p, j) => <option key={`subCategory-${j}`} value={p.subCategory}>{p.subCategory}</option>)}
-                        </FormControl>
-                      </Col>
-                    </FormGroup>
-                    <FormGroup controlId="formHorizontalPedagogyObjective">
-                      <Col sm={12}>
-                        <FormControl onChange={this.handleChangePedagogy.bind(this, index, 'objective')} value={pedagogy.objective} componentClass="select">
-                          <option key="none" value="none">-- Objectif --</option>
-                          {_.uniqBy(this.allPedagogy.filter(p => p.level == pedagogy.level && p.category === pedagogy.category && p.subCategory === pedagogy.subCategory), 'objective').map((p, j) => <option key={`objective-${j}`} value={p.objective}>{p.objective}</option>)}
-                        </FormControl>
-                      </Col>
-                    </FormGroup>
-                    <FormGroup controlId="formHorizontalPedagogyPillar">
-                      <Col componentClass={ControlLabel} sm={4}>
-                        Lier l'objectif
-                      </Col>
-                      <Col sm={6}>
-                        <FormControl onChange={this.handleChangePedagogy.bind(this, index, 'pillar')} value={pedagogy.pillar} componentClass="select">
-                          <option key="none" value="none">-- Pillier --</option>
-                          {this.genPillarOptions(this.allPedagogy.find(p => p.level == pedagogy.level && p.category === pedagogy.category && p.subCategory === pedagogy.subCategory && p.objective === pedagogy.objective))}
-                        </FormControl>
-                      </Col>
-                    </FormGroup>
-                    <FormGroup style={({textAlign:'center'})}>
-                      <Col sm={0}>
-                        <Button bsStyle="danger" onClick={this.deletePedagogy.bind(this, index)}>Supprimer</Button>
-                      </Col>
-                    </FormGroup>
-                    <hr/>
+                      <Pedagogy pedagogy={pedagogy} onChange={this.handleChangePedagogy.bind(this, index)} />
+                      <FormGroup style={({textAlign:'center'})}>
+                        <Col sm={0}>
+                          <Button bsStyle="danger" onClick={this.deletePedagogy.bind(this, index)}>Supprimer</Button>
+                        </Col>
+                      </FormGroup>
+                      <hr/>
                     </div>
                   )}
                   <FormGroup>
