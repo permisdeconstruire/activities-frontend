@@ -13,6 +13,7 @@ import {authFetch} from './common/utils'
 import AdminCalendar from './admin/AdminCalendar'
 import AdminHeader from './admin/AdminHeader'
 import AdminPedagogy from './admin/AdminPedagogy'
+import AdminEvent from './admin/AdminEvent'
 import FormsBuilder from './admin/FormsBuilder'
 import FormViewer from './common/FormViewer'
 
@@ -52,6 +53,8 @@ class App extends React.Component {
         element = <FormViewer formTitle="Pilote" api="/admin/pilotes" keyname="email"/>
       } else if(this.state.route === '#pedagogy') {
         element = <AdminPedagogy />
+      } else if(this.state.route === '#event') {
+        element = <AdminEvent />
       } else {
         element = <PiloteCalendar whoami={this.state.whoami}/>
         header = <PiloteHeader whoami={this.state.whoami} />

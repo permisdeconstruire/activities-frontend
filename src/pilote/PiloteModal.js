@@ -154,7 +154,7 @@ class PiloteModal extends React.Component {
               {
                 this.state.pedagogy.map((pedagogy, index) => (
                   <>
-                  <Row title={pedagogy.pillar} className={`pedagogyRow`} key={index}>
+                  <Row title={pedagogy.pillar} className={`pedagogyRow`} key={`peda_${index}`}>
                     <Col sm={12} style={({textAlign:'center'})}>
                       {`${pedagogy.objective}`}
                     </Col>
@@ -163,8 +163,8 @@ class PiloteModal extends React.Component {
                     </Col>
                     <Col sm={5}>
                     {
-                      Array.apply(null, {length: pedagogy.level}).map(k => (
-                        <span class="fa fa-star starChecked"></span>
+                      Array.apply(null, {length: pedagogy.level}).map((k, i) => (
+                        <span key={`star_${i}`} className="fa fa-star starChecked"></span>
                       ))
                     }
                     </Col>
