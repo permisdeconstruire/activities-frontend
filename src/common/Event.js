@@ -27,7 +27,7 @@ class Event extends React.Component {
           <a href={`https://www.google.com/maps/search/${this.props.event.place}`} target="_blank" rel="noopener noreferrer">{this.props.event.place}</a>
         </div>
         <div className='event-annotation'>{this.props.event.annotation}</div>
-        <div className='event-participants'>{this.props.event.contributor} & {this.props.event.copilot}</div>
+        <div className='event-participants'>{this.props.event.cooperators.join(' & ')}</div>
       </>
     );
   }

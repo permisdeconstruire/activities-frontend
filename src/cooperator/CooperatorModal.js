@@ -20,7 +20,7 @@ registerLocale('fr', fr);
 
 const dateFormat = 'dd/MM/YYYY HH:mm'
 
-class PiloteModal extends React.Component {
+class CooperatorModal extends React.Component {
 
   defaultState() {
     return {
@@ -125,8 +125,11 @@ class PiloteModal extends React.Component {
           <Panel.Heading>Participants</Panel.Heading>
           <Panel.Body>
             <Row>
-              <Col sm={12}>
-                Intervenants : {event.cooperators.join(', ')}
+              <Col sm={6}>
+                Intervenant : {event.contributor}
+              </Col>
+              <Col sm={6}>
+                Copilote : {event.copilot}
               </Col>
             </Row>
             <hr/>
@@ -152,14 +155,21 @@ class PiloteModal extends React.Component {
                 this.state.pedagogy.map((pedagogy, index) => (
                   <>
                   <Row title={pedagogy.pillar} className={`pedagogyRow`} key={`peda_${index}`}>
-                    <Col sm={10} style={({fontWeight:'bold'})} className={colorPillar(pedagogy.pillar)}>
-                      {pedagogy.category}
+                    <Col sm={12} style={({textAlign:'center'})}>
+                      {`${pedagogy.objective}`}
+                    </Col>
+                    <Col sm={5} style={({fontWeight:'bold'})} className={colorPillar(pedagogy.pillar)}>
+                      {pedagogy.pillar}
+                    </Col>
+                    <Col sm={5}>
+                    {
+                      Array.apply(null, {length: pedagogy.level}).map((k, i) => (
+                        <span key={`star_${i}`} className="fa fa-star starChecked"></span>
+                      ))
+                    }
                     </Col>
                     <Col sm={2}>
                       <Button bsStyle={pedagogy.checked ? 'success' : 'default'} onClick={this.handleCheckPedagogy.bind(this, index)}>OK</Button>
-                    </Col>
-                    <Col sm={12} style={({textAlign:'center'})}>
-                      {`${pedagogy.objective}`}
                     </Col>
                   </Row>
                   <hr />
@@ -219,4 +229,4 @@ class PiloteModal extends React.Component {
   }
 }
 
-export default PiloteModal
+export default CooperatorModal

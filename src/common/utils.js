@@ -51,9 +51,20 @@ function listPedagogy() {
     .then(res => res.json())
 }
 
+function listCooperators() {
+  return fetch(`${process.env.REACT_APP_BACKEND}/v0/cooperators`)
+    .then(res => res.json())
+}
+
+function logout() {
+  window.localStorage.removeItem('jwtPDC');
+}
+
 module.exports = {
   colorPillar,
   colorActivity,
   authFetch,
   listPedagogy,
+  listCooperators,
+  logout,
 }

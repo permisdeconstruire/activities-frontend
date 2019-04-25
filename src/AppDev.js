@@ -12,6 +12,8 @@ import PiloteHeader from './pilote/PiloteHeader'
 import {authFetch} from './common/utils'
 import AdminCalendar from './admin/AdminCalendar'
 import AdminHeader from './admin/AdminHeader'
+import CooperatorCalendar from './cooperator/CooperatorCalendar'
+import CooperatorHeader from './cooperator/CooperatorHeader'
 import AdminPedagogy from './admin/AdminPedagogy'
 import AdminEvent from './admin/AdminEvent'
 import FormsBuilder from './admin/FormsBuilder'
@@ -37,6 +39,7 @@ class App extends React.Component {
     window.addEventListener("hashchange", this.changeRoute, false);
     authFetch(`${process.env.REACT_APP_BACKEND}/v0/whoami`)
       .then(whoami => {
+        console.log(whoami);
         this.setState({whoami})
       })
   }
@@ -47,6 +50,9 @@ class App extends React.Component {
       let header = <AdminHeader whoami={this.state.whoami} />;
       if(this.state.route === '#admin') {
         element = <AdminCalendar />
+      } else if(this.state.route === '#cooperator') {
+        element = <CooperatorCalendar whoami={this.state.whoami}/>
+        header = <CooperatorHeader whoami={this.state.whoami} />
       } else if(this.state.route === '#forms') {
         element = <FormsBuilder/>
       } else if(this.state.route === '#pilotes') {

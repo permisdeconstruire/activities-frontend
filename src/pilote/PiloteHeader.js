@@ -11,12 +11,14 @@ import {
   FormControl,
 } from 'react-bootstrap';
 
+import {logout} from '../common/utils'
+
 class PiloteHeader extends React.Component {
   render(){
     return (
       <div className="container">
         <Row>
-          Bonjour {this.props.whoami.user.email}, bienvenue chez Permis de Construire.
+          Bonjour {this.props.whoami.email}, bienvenue chez Permis de Construire.<a href="/" onClick={logout}>Se déconnecter</a>
         </Row>
       </div>
     );

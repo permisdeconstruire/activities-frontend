@@ -386,3 +386,7 @@ h4 a:focus .anchor-icon {
   position: relative;
   overflow: hidden;
 }
+
+.is-cooperator-true .rbc-event{
+  border: 5px solid red;
+}

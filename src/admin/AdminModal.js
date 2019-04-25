@@ -15,7 +15,7 @@ import {
 import DatePicker from 'react-datepicker'
 import { registerLocale }  from 'react-datepicker'
 import fr from 'date-fns/locale/fr';
-import {authFetch, listPedagogy} from '../common/utils'
+import {authFetch, listCooperators} from '../common/utils'
 import Pedagogy from '../common/Pedagogy'
 registerLocale('fr', fr);
 
@@ -45,7 +45,7 @@ function renderSuggestion(suggestion) {
 
 class AdminModal extends React.Component {
 
-  allPedagogy = []
+  allCooperators = []
 
   defaultState() {
     return {
@@ -55,13 +55,12 @@ class AdminModal extends React.Component {
       end: new Date(),
       status: status[0],
       theme: '',
-      contributor: '',
+      cooperators: ['none'],
       pedagogy: [],
       cost: 0,
       estimated: 0,
       place: '',
       annotation: '',
-      copilot: '',
       step:0,
       published: false,
       copyActivity: 'none',
@@ -76,6 +75,7 @@ class AdminModal extends React.Component {
   constructor(props, context) {
     super(props, context);
 
+    this.handleClose = this.handleClose.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleNavigation = this.handleNavigation.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -85,6 +85,11 @@ class AdminModal extends React.Component {
     this.addPedagogy = this.addPedagogy.bind(this);
     this.deletePedagogy = this.deletePedagogy.bind(this);
     this.handleChangePedagogy = this.handleChangePedagogy.bind(this);
+
+    this.addCooperator = this.addCooperator.bind(this);
+    this.deleteCooperator = this.deleteCooperator.bind(this);
+    this.handleChangeCooperator = this.handleChangeCooperator.bind(this);
+
     this.copyActivity = this.copyActivity.bind(this);
     this.onSuggestionsFetchRequested = this.onSuggestionsFetchRequested.bind(this);
     this.onSuggestionsClearRequested = this.onSuggestionsClearRequested.bind(this);
@@ -94,9 +99,9 @@ class AdminModal extends React.Component {
   }
 
   componentDidMount() {
-    listPedagogy()
+    listCooperators()
       .then(res => {
-        this.allPedagogy = res;
+        this.allCooperators = res;
       })
   }
 
@@ -125,13 +130,12 @@ class AdminModal extends React.Component {
       newState.title = activity.title;
       newState.status = activity.status;
       newState.theme = activity.theme;
-      newState.contributor = activity.contributor;
       newState.pedagogy = activity.pedagogy;
       newState.cost = activity.cost;
       newState.estimated = activity.estimated;
       newState.place = activity.place;
       newState.annotation = activity.annotation;
-      newState.copilot = activity.copilot;
+      newState.cooperators = activity.cooperators;
       newState.published = false;
       this.setState(newState);
     }
@@ -145,7 +149,7 @@ class AdminModal extends React.Component {
 
   addPedagogy() {
     const newState = this.state;
-    newState.pedagogy.push({category: '', subCategory: '', objective: '', pillar: ''})
+    newState.pedagogy.push({category: 'none', subCategory: 'none', objective: 'none', pillar: 'none'})
     this.setState(newState)
   }
 
@@ -153,6 +157,24 @@ class AdminModal extends React.Component {
     const newPedagogy = this.state.pedagogy;
     newPedagogy[index] = peda;
     this.setState({pedagogy: newPedagogy})
+  }
+
+  deleteCooperator(index) {
+    const newCooperators = this.state.cooperators;
+    newCooperators.splice(index, 1);
+    this.setState({cooperators: newCooperators})
+  }
+
+  addCooperator() {
+    const newState = this.state;
+    newState.cooperators.push('none')
+    this.setState(newState)
+  }
+
+  handleChangeCooperator(index, event) {
+    const newCooperators = this.state.cooperators;
+    newCooperators[index] = event.target.value;
+    this.setState({cooperators: newCooperators})
   }
 
   handleChangeDate(field, value){
@@ -229,6 +251,11 @@ class AdminModal extends React.Component {
     this.setState(newState);
   }
 
+  handleClose() {
+    this.props.refresh();
+    this.props.onClose();
+  }
+
   handleSubmit(event) {
     const id = this.state.id;
     const data = {
@@ -237,13 +264,12 @@ class AdminModal extends React.Component {
       end: this.state.end,
       status: this.state.status,
       theme: this.state.theme,
-      contributor: this.state.contributor,
       pedagogy: this.state.pedagogy,
       cost: this.state.cost,
       estimated: this.state.estimated,
       place: this.state.place,
       annotation: this.state.annotation,
-      copilot: this.state.copilot,
+      cooperators: this.state.cooperators,
       published: this.state.published,
     }
 
@@ -422,21 +448,24 @@ class AdminModal extends React.Component {
               </Panel>
 
               <Panel>
-                <Panel.Heading>Participants</Panel.Heading>
+                <Panel.Heading>Intervenants</Panel.Heading>
                 <Panel.Body>
                   <FormGroup controlId="formHorizontalParticipants">
-                    <Col componentClass={ControlLabel} sm={2}>
-                      Intervenant
-                    </Col>
-                    <Col sm={4}>
-                      <FormControl onChange={this.handleChange.bind(this, 'contributor')} value={this.state.contributor} type="text" placeholder="Jean-Michel" />
-                    </Col>
-
-                    <Col componentClass={ControlLabel} sm={2}>
-                      Copilote
-                    </Col>
-                    <Col sm={4}>
-                      <FormControl onChange={this.handleChange.bind(this, 'copilot')} value={this.state.copilot} type="text" placeholder="Gladys" />
+                    {this.state.cooperators.map((cooperator, index) =>
+                      <div key={index}>
+                      <Col style={({marginBottom:'10px'})} key={index} sm={index > 0 ? 5 : 6}>
+                        <FormControl onChange={this.handleChangeCooperator.bind(this, index)} value={cooperator} componentClass="select">
+                          <option key="none" value="none">------</option>
+                          {this.allCooperators.map((c) => <option key={c.email} value={c.email}>{c.email}</option>)}
+                        </FormControl>
+                      </Col>
+                      {index > 0 && (<Col sm={1}><Button bsStyle="danger" onClick={this.deleteCooperator.bind(this, index)}>-</Button></Col>)}
+                      </div>
+                    )}
+                  </FormGroup>
+                  <FormGroup>
+                    <Col style={({textAlign:'center'})}>
+                      <Button bsStyle="success" onClick={this.addCooperator}>+</Button>
                     </Col>
                   </FormGroup>
                 </Panel.Body>
@@ -492,7 +521,7 @@ class AdminModal extends React.Component {
           {this.state.id !== '' &&
             <Button onClick={this.handleDelete} bsStyle="danger">Supprimer</Button>
           }
-          <Button onClick={this.props.onClose} bsStyle="default">Fermer</Button>
+          <Button onClick={this.handleClose} bsStyle="default">Fermer</Button>
         </Modal.Footer>
       </Modal>
     )

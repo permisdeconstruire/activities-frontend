@@ -20,8 +20,8 @@ function convertToBigCalendarEvents(events, whoami) {
     newEvent.start = new Date(newEvent.start)
     newEvent.end = new Date(newEvent.end)
     newEvent.isRegistered = false
-    if(typeof(whoami) !== 'undefined' && typeof(whoami.user) !== 'undefined' && typeof(event.participants) !== 'undefined') {
-      newEvent.isRegistered = event.participants.indexOf(whoami.user.email) !== -1;
+    if(typeof(whoami) !== 'undefined' && typeof(event.participants) !== 'undefined') {
+      newEvent.isRegistered = event.participants.indexOf(whoami.email) !== -1;
     }
     return newEvent;
   })

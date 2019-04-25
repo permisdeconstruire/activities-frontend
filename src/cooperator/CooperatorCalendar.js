@@ -3,30 +3,31 @@ import BigCalendar from 'react-big-calendar'
 
 import moment from 'moment'
 import localizer from 'react-big-calendar/lib/localizers/globalize'
-import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop'
-import 'react-big-calendar/lib/addons/dragAndDrop/styles.css'
 import globalize from 'globalize'
 import EventWrapper from '../common/EventWrapper'
-import TimeSlotWrapper from '../common/TimeSlotWrapper'
 import Event from '../common/Event'
-import AdminModal from './AdminModal'
-import {authFetch} from '../common/utils'
+import TimeSlotWrapper from '../common/TimeSlotWrapper'
+import CooperatorModal from './CooperatorModal'
 
-const DragAndDropCalendar = withDragAndDrop(BigCalendar)
 require('globalize/lib/cultures/globalize.culture.fr')
 const globalizeLocalizer = localizer(globalize)
 
-function convertToBigCalendarEvents(events) {
+
+function convertToBigCalendarEvents(events, whoami) {
   return events.map(event => {
     const newEvent = event;
     newEvent.id = newEvent._id;
     newEvent.start = new Date(newEvent.start)
     newEvent.end = new Date(newEvent.end)
+    newEvent.isCooperator = false
+    if(typeof(whoami) !== 'undefined' && typeof(event.cooperators) !== 'undefined') {
+      newEvent.isCooperator = event.cooperators.indexOf(whoami.email) !== -1;
+    }
     return newEvent;
   })
 }
 
-class AdminCalendar extends React.Component {
+class CooperatorCalendar extends React.Component {
 
   defaultState() {
     return {
@@ -41,8 +42,6 @@ class AdminCalendar extends React.Component {
     super(props, context);
 
     this.handleClose = this.handleClose.bind(this);
-    this.onSelectSlot = this.onSelectSlot.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
     this.onSelectEvent = this.onSelectEvent.bind(this);
     this.refresh = this.refresh.bind(this);
 
@@ -50,9 +49,10 @@ class AdminCalendar extends React.Component {
   }
 
   refresh() {
-    authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/activities`)
+    fetch(`${process.env.REACT_APP_BACKEND}/v0/activities`)
+      .then(res => res.json())
       .then(events => {
-        this.setState({events: convertToBigCalendarEvents(events)})
+        this.setState({events: convertToBigCalendarEvents(events, this.props.whoami)})
       })
   }
 
@@ -60,43 +60,20 @@ class AdminCalendar extends React.Component {
     this.refresh();
   }
 
-  onSelectSlot(slotInfo){
-    this.setState({ show: true, start: slotInfo.start, end: slotInfo.end, currentEventId: '' });
-  }
-
   onSelectEvent(event) {
-    this.setState({ show: true, currentEventId: event.id});
+    if(event.status !== 'Fermeture' && event.status !== 'Autonomie' && event.isCooperator) {
+      this.setState({ show: true, currentEventId: event.id});
+    }
   }
 
   handleClose() {
-    this.setState({ show: false, currentEventId: null, start: new Date(), end: new Date()});
-  }
-
-  handleSubmit(event) {
-    const id = event.event.id;
-    const data = {
-      start: event.start,
-      end: event.end,
-    }
-
-
-    authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/activities/id/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(data),
-      headers:{
-        'Content-Type': 'application/json'
-      }
-    })
-    .then(res => {
-      this.handleClose();
-      this.componentDidMount();
-    })
+    this.setState({show: false, currentEventId: null});
   }
 
   render() {
     return (
       <>
-        <AdminModal
+        <CooperatorModal
           events={this.state.events}
           start={this.state.start}
           end={this.state.end}
@@ -105,25 +82,22 @@ class AdminCalendar extends React.Component {
           show={this.state.show}
           refresh={this.refresh}
         />
-        <DragAndDropCalendar
-          resizable
+        <BigCalendar
+          whoami={this.props.whoami}
           events={this.state.events}
           views={['work_week']}
           defaultView='work_week'
           culture='fr'
           components={({timeSlotWrapper: TimeSlotWrapper, event: Event, eventWrapper: EventWrapper})}
-          selectable='ignoreEvents'
-          onSelectSlot={this.onSelectSlot}
+          selectable={false}
           onSelectEvent={this.onSelectEvent}
           min={moment().startOf('day').add(9, 'hours').toDate()}
           max={moment().startOf('day').add(17, 'hours').toDate()}
           localizer={globalizeLocalizer}
-          onEventResize={this.handleSubmit}
-          onEventDrop={this.handleSubmit}
         />
       </>
     )
   }
 }
 
-export default AdminCalendar
+export default CooperatorCalendar
