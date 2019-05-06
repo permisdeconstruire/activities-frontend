@@ -4,9 +4,9 @@ function colorActivity(status) {
   } else if (status === 'Socio-éducatif') {
     return 'greenActivity'
   } else if (status === 'Formative') {
-    return 'greenActivity'
-  } else if (status === 'Individuelle') {
     return 'blueActivity'
+  } else if (status === 'Individuelle') {
+    return 'purpleActivity'
   } else if (status === 'Fermeture') {
     return 'grayActivity'
   }

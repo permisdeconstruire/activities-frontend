@@ -46,6 +46,7 @@ class FormViewer extends React.Component {
     // this.handleChangeTitle = this.handleChangeTitle.bind(this);
     // this.saveData = this.saveData.bind(this)
     // this.getForms = this.getForms.bind(this);
+    this.update = this.update.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.select = this.select.bind(this);
     this.delete = this.delete.bind(this);
@@ -222,10 +223,17 @@ class FormViewer extends React.Component {
   }
 
   fv = createRef();
-  componentDidMount() {
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if(prevProps.formTitle !== this.props.formTitle){
+      this.update()
+    }
+  }
+
+  update() {
     const title = this.props.formTitle;
     let form;
-    fetch(`${process.env.REACT_APP_BACKEND}/v0/forms/title/${title}`)
+    fetch(`${process.env.REACT_APP_BACKEND}/v0/forms/title/${this.props.formType}/${title}`)
     .then(res => res.json())
     .then(res => {
       form = $(this.fv.current).formRender({
@@ -236,6 +244,10 @@ class FormViewer extends React.Component {
     .then(res => {
       this.setState({form, title, list: res})
     })
+  }
+
+  componentDidMount() {
+    this.update()
   }
 
   render() {

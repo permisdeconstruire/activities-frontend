@@ -45,8 +45,12 @@ class App extends React.Component {
       let header = <AdminHeader whoami={this.state.whoami} />;
       if(this.state.route === '#forms') {
         element = <FormsBuilder/>
-      } else if(this.state.route === '#pilotes') {
-        element = <FormViewer formTitle="Pilote" api="/admin/pilotes" keyname="email"/>
+      } else if(this.state.route.startsWith('#form')) {
+        const formTitle = this.state.route.replace('#form_', '');
+        element = <FormViewer formType="pilote" formTitle={formTitle} api="/admin/pilotes" keyname="email"/>
+        header = <AdminHeader whoami={this.state.whoami} />;
+      } else if(this.state.route === '#cooperators') {
+        element = <FormViewer formTitle="Coopérateur" api="/admin/cooperators" keyname="titre"/>
       } else if(this.state.route === '#pedagogy') {
         element = <AdminPedagogy />
       } else if(this.state.route === '#event') {
@@ -56,8 +60,13 @@ class App extends React.Component {
       }
       return (
         <div className="app">
+          {header}
           <div className="jumbotron">
-            {header}
+            <div className="container">
+              <Row>
+                Bonjour {this.state.whoami.email}, bienvenue chez Permis de Construire. <a href="/" onClick={logout}>Se déconnecter</a>
+              </Row>
+            </div>
           </div>
           <div className="examples">
             <div className="example">

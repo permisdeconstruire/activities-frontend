@@ -456,7 +456,7 @@ class AdminModal extends React.Component {
                       <Col style={({marginBottom:'10px'})} key={index} sm={index > 0 ? 5 : 6}>
                         <FormControl onChange={this.handleChangeCooperator.bind(this, index)} value={cooperator} componentClass="select">
                           <option key="none" value="none">------</option>
-                          {this.allCooperators.map((c) => <option key={c.email} value={c.email}>{c.email}</option>)}
+                          {this.allCooperators.map((c) => <option key={c.titre} value={c.titre}>{c.titre}</option>)}
                         </FormControl>
                       </Col>
                       {index > 0 && (<Col sm={1}><Button bsStyle="danger" onClick={this.deleteCooperator.bind(this, index)}>-</Button></Col>)}

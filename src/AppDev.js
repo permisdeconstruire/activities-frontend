@@ -5,11 +5,13 @@ import 'font-awesome/css/font-awesome.min.css'
 
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 import 'react-datepicker/dist/react-datepicker.css'
+import { Row } from 'react-bootstrap';
+
 import './styles.css'
 import './prism.css'
 import PiloteCalendar from './pilote/PiloteCalendar'
 import PiloteHeader from './pilote/PiloteHeader'
-import {authFetch} from './common/utils'
+import {authFetch, logout} from './common/utils'
 import AdminCalendar from './admin/AdminCalendar'
 import AdminHeader from './admin/AdminHeader'
 import CooperatorCalendar from './cooperator/CooperatorCalendar'
@@ -47,28 +49,40 @@ class App extends React.Component {
   render() {
     if(this.state.whoami !== null) {
       let element;
-      let header = <AdminHeader whoami={this.state.whoami} />;
+      let header;
       if(this.state.route === '#admin') {
         element = <AdminCalendar />
+        header = <AdminHeader whoami={this.state.whoami} />;
       } else if(this.state.route === '#cooperator') {
         element = <CooperatorCalendar whoami={this.state.whoami}/>
-        header = <CooperatorHeader whoami={this.state.whoami} />
+        // header = <CooperatorHeader whoami={this.state.whoami} />
       } else if(this.state.route === '#forms') {
         element = <FormsBuilder/>
-      } else if(this.state.route === '#pilotes') {
-        element = <FormViewer formTitle="Pilote" api="/admin/pilotes" keyname="email"/>
+        header = <AdminHeader whoami={this.state.whoami} />;
+      } else if(this.state.route.startsWith('#form')) {
+        const formTitle = this.state.route.replace('#form_', '');
+        element = <FormViewer formType="pilote" formTitle={formTitle} api="/admin/pilotes" keyname="email"/>
+        header = <AdminHeader whoami={this.state.whoami} />;
+      } else if(this.state.route === '#cooperators') {
+        element = <FormViewer formType="cooperator" formTitle="Coopérateur" api="/admin/cooperators" keyname="titre"/>
+        header = <AdminHeader whoami={this.state.whoami} />;
       } else if(this.state.route === '#pedagogy') {
         element = <AdminPedagogy />
       } else if(this.state.route === '#event') {
         element = <AdminEvent />
+        header = <AdminHeader whoami={this.state.whoami} />;
       } else {
         element = <PiloteCalendar whoami={this.state.whoami}/>
-        header = <PiloteHeader whoami={this.state.whoami} />
       }
       return (
         <div className="app">
+          {header && header}
           <div className="jumbotron">
-            {header}
+            <div className="container">
+              <Row>
+                Bonjour {this.state.whoami.email}, bienvenue chez Permis de Construire. <a href="/" onClick={logout}>Se déconnecter</a>
+              </Row>
+            </div>
           </div>
           <div className="examples">
             <div className="example">

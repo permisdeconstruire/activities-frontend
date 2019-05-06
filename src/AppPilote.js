@@ -41,7 +41,11 @@ class App extends React.Component {
       return (
         <div className="app">
           <div className="jumbotron">
-            {header}
+            <div className="container">
+              <Row>
+                Bonjour {this.state.whoami.email}, bienvenue chez Permis de Construire. <a href="/" onClick={logout}>Se déconnecter</a>
+              </Row>
+            </div>
           </div>
           <div className="examples">
             <div className="example">

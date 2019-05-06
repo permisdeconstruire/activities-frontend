@@ -25,7 +25,7 @@ class FormsBuilder extends React.Component {
     return {
       form: false,
       forms: [],
-      selectedForm: {_id: 'none', title: '', formData: ''}
+      selectedForm: {_id: 'none', type: '', title: '', formData: ''}
     };
   }
 
@@ -33,6 +33,7 @@ class FormsBuilder extends React.Component {
     super(props, context);
 
     this.selectForm = this.selectForm.bind(this);
+    this.selectType = this.selectType.bind(this);
     this.handleChangeTitle = this.handleChangeTitle.bind(this);
     this.saveData = this.saveData.bind(this)
     this.getForms = this.getForms.bind(this);
@@ -72,8 +73,20 @@ class FormsBuilder extends React.Component {
 
   selectForm(event) {
     const selectedForm = this.state.forms.find(form => form._id === event.target.value)
-    this.state.form.actions.setData(selectedForm.formData)
-    this.setState({selectedForm});
+    if(typeof(selectedForm) !== 'undefined') {
+      this.state.form.actions.setData(selectedForm.formData)
+      this.setState({selectedForm});
+    } else {
+      this.state.form.actions.setData('')
+      const defaultForm = this.defaultState();
+      this.setState({selectedForm: defaultForm.selectedForm});
+    }
+  }
+
+  selectType(event) {
+    const oldSelectedForm = this.state.selectedForm;
+    oldSelectedForm.type = event.target.value;
+    this.setState({selectedForm: oldSelectedForm})
   }
 
   saveData() {
@@ -82,6 +95,7 @@ class FormsBuilder extends React.Component {
         method: 'PUT',
         body: JSON.stringify({
           title: this.state.selectedForm.title,
+          type: this.state.selectedForm.type,
           formData: JSON.stringify(this.state.form.actions.getData())
         }),
         headers:{
@@ -90,12 +104,14 @@ class FormsBuilder extends React.Component {
       })
       .then(res => {
         this.getForms(this.state.selectedForm._id)
+        alert('Formulaire sauvegardé !')
       })
     } else {
       authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/forms`, {
         method: 'POST',
         body: JSON.stringify({
           title: this.state.selectedForm.title,
+          type: this.state.selectedForm.type,
           formData: JSON.stringify(this.state.form.actions.getData())
         }),
         headers:{
@@ -104,6 +120,7 @@ class FormsBuilder extends React.Component {
       })
       .then(res => {
         this.getForms(res)
+        alert('Formulaire sauvegardé !')
       })
     }
   }
@@ -150,6 +167,18 @@ class FormsBuilder extends React.Component {
                 </Col>
               )
             }
+          </FormGroup>
+          <FormGroup controlId="formHorizontalSelectForm">
+            <Col componentClass={ControlLabel} sm={4}>
+              Sélectionner type
+            </Col>
+            <Col sm={4}>
+                <FormControl onChange={this.selectType} value={this.state.selectedForm.type} componentClass="select">
+                  <option key="none" value="none">-- Type --</option>
+                  <option key="pilote" value="pilote">Pilote</option>
+                  <option key="cooperator" value="cooperator">Coopérateur</option>
+                </FormControl>
+            </Col>
           </FormGroup>
           <FormGroup controlId="formHorizontalTitle">
             <Col componentClass={ControlLabel} sm={4}>

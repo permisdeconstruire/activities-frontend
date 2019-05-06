@@ -9,22 +9,24 @@ import {
   Col,
   ControlLabel,
   FormControl,
+  ButtonToolbar,
+  Navbar,
+  Nav,
+  NavDropdown,
+  NavItem,
+  MenuItem,
 } from 'react-bootstrap';
-
-import {logout} from '../common/utils'
+import {authFetch, logout} from '../common/utils'
 
 class CooperatorHeader extends React.Component {
   render(){
     return (
-      <div className="container">
-        <Row>
-          Bonjour {this.props.whoami.email}, bienvenue chez Permis de Construire. <a href="/" onClick={logout}>Se déconnecter</a>
-        </Row>
-        <Row>
-          <Col sm={6}><a href="/">Agenda</a></Col>
-          <Col sm={6}><a href="/#event">Générer un événement</a></Col>
-        </Row>
-      </div>
+      <Navbar>
+        <Nav>
+          <NavItem eventKey={1} href="#cooperator">Gérer l'agenda</NavItem>
+          <NavItem eventKey={4} href="/#event">Générer un événement</NavItem>
+        </Nav>
+      </Navbar>
     );
   }
 }
