@@ -52,7 +52,12 @@ class AdminEvent extends React.Component {
 
   handleChange(field, event){
     const newState = this.state;
-    newState[field] = event.target.value
+    if(field === 'pilote') {
+      const selectedPilote = this.state.piloteList.find(pilote => pilote._id === event.target.value);
+      newState.pilote = {_id: selectedPilote._id, pseudo: selectedPilote.pseudo};
+    } else {
+      newState[field] = event.target.value
+    }
     if(field === 'type') {
       if(event.target.value === 'courrier') {
         newState.data = {status: 'relance'}
@@ -88,6 +93,7 @@ class AdminEvent extends React.Component {
       }
     })
     .then(res => {
+      alert('Événement généré');
       const piloteList = this.state.piloteList;
       const newState = this.defaultState();
       newState.piloteList = piloteList;
@@ -125,9 +131,9 @@ class AdminEvent extends React.Component {
               </FormControl>
             </Col>
             <Col sm={4}>
-              <FormControl onChange={this.handleChange.bind(this, 'pilote')} value={this.state.pilote} componentClass="select">
+              <FormControl onChange={this.handleChange.bind(this, 'pilote')} value={this.state.pilote._id} componentClass="select">
                 <option key="none" value="none">-- Pilote --</option>
-                {this.state.piloteList.map(pilote => <option key={pilote.email} value={pilote.email}>{pilote.email}</option>)}
+                {this.state.piloteList.map(pilote => <option key={pilote._id} value={pilote._id}>{pilote.pseudo}</option>)}
               </FormControl>
             </Col>
           </FormGroup>

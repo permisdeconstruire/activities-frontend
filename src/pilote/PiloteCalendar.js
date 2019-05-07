@@ -8,6 +8,7 @@ import EventWrapper from '../common/EventWrapper'
 import Event from '../common/Event'
 import TimeSlotWrapper from '../common/TimeSlotWrapper'
 import PiloteModal from './PiloteModal'
+import {authFetch} from '../common/utils'
 
 require('globalize/lib/cultures/globalize.culture.fr')
 const globalizeLocalizer = localizer(globalize)
@@ -21,8 +22,9 @@ function convertToBigCalendarEvents(events, whoami) {
     newEvent.end = new Date(newEvent.end)
     newEvent.isRegistered = false
     if(typeof(whoami) !== 'undefined' && typeof(event.participants) !== 'undefined') {
-      newEvent.isRegistered = event.participants.indexOf(whoami.email) !== -1;
+      newEvent.isRegistered = event.participants.findIndex(participant => participant._id === whoami.roles.pilote) !== -1;
     }
+    newEvent.pedagogy = newEvent.pedagogy.filter(pedagogy => whoami.levels[pedagogy.category] === 0 || pedagogy.level <= whoami.levels[pedagogy.category])
     return newEvent;
   })
 }
@@ -49,8 +51,7 @@ class PiloteCalendar extends React.Component {
   }
 
   refresh() {
-    fetch(`${process.env.REACT_APP_BACKEND}/v0/activities`)
-      .then(res => res.json())
+    authFetch(`${process.env.REACT_APP_BACKEND}/v0/pilote/activities`)
       .then(events => {
         this.setState({events: convertToBigCalendarEvents(events, this.props.whoami)})
       })

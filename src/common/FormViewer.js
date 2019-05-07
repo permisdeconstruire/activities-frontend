@@ -219,6 +219,7 @@ class FormViewer extends React.Component {
       })
       .then(res => {
         this.setState({list: res, selected: id});
+        alert('Élément sauvegardé !')
       })
   }
 
@@ -230,7 +231,7 @@ class FormViewer extends React.Component {
     }
   }
 
-  update() {
+  update(selected) {
     const title = this.props.formTitle;
     let form;
     fetch(`${process.env.REACT_APP_BACKEND}/v0/forms/title/${this.props.formType}/${title}`)
@@ -242,7 +243,7 @@ class FormViewer extends React.Component {
       return authFetch(`${process.env.REACT_APP_BACKEND}/v0${this.props.api}`);
     })
     .then(res => {
-      this.setState({form, title, list: res})
+      this.setState({form, title, list: res, selected: 'none'})
     })
   }
 

@@ -126,15 +126,15 @@ class PiloteModal extends React.Component {
           <Panel.Body>
             <Row>
               <Col sm={12}>
-                Intervenants : {event.cooperators.join(', ')}
+                Intervenants : {event.cooperators.map(cooperator => cooperator.titre).join(' & ')}
               </Col>
             </Row>
             <hr/>
             <Row>
               {
                 participants.map(participant => (
-                  <Col sm={6} key={participant}>
-                    {participant}
+                  <Col sm={6} key={participant._id}>
+                    {participant.pseudo}
                   </Col>
                 ))
               }
@@ -150,7 +150,7 @@ class PiloteModal extends React.Component {
             <Form horizontal>
               {
                 this.state.pedagogy.map((pedagogy, index) => (
-                  <>
+                  <div key={`peda_${index}`}>
                   <Row title={pedagogy.pillar} className={`pedagogyRow`} key={`peda_${index}`}>
                     <Col sm={10} style={({fontWeight:'bold'})} className={colorPillar(pedagogy.pillar)}>
                       {pedagogy.category}
@@ -163,7 +163,7 @@ class PiloteModal extends React.Component {
                     </Col>
                   </Row>
                   <hr />
-                  </>
+                  </div>
                 ))
               }
             </Form>
@@ -198,7 +198,13 @@ class PiloteModal extends React.Component {
               {event.isRegistered ?
                 <Button onClick={this.handleUnregistration} bsStyle="danger">Se désinscrire</Button>
               :
-                <Button bsStyle="success" onClick={this.handleRegistration}>S'inscrire</Button>
+              <>
+                {this.state.pedagogy.length > 0 ?
+                  <Button bsStyle="success" onClick={this.handleRegistration}>S'inscrire</Button>
+                :
+                  <Button bsStyle="default">Tu ne peux pas encore t'inscrire à cette activité</Button>
+                }
+              </>
               }
             </>
           }

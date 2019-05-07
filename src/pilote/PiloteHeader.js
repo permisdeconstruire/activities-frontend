@@ -18,7 +18,7 @@ class PiloteHeader extends React.Component {
     return (
       <div className="container">
         <Row>
-          Bonjour {this.props.whoami.email}, bienvenue chez Permis de Construire.<a href="/" onClick={logout}>Se déconnecter</a>
+          Bonjour {this.props.whoami.pseudo}, bienvenue chez Permis de Construire.<a href="/" onClick={logout}>Se déconnecter</a>
         </Row>
       </div>
     );

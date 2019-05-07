@@ -167,13 +167,14 @@ class AdminModal extends React.Component {
 
   addCooperator() {
     const newState = this.state;
-    newState.cooperators.push('none')
+    newState.cooperators.push({_id: 'none', titre:'none'})
     this.setState(newState)
   }
 
   handleChangeCooperator(index, event) {
     const newCooperators = this.state.cooperators;
-    newCooperators[index] = event.target.value;
+    const selectedCooperator = this.allCooperators.find(cooperator => cooperator._id === event.target.value);
+    newCooperators[index] = {_id: selectedCooperator._id, titre: selectedCooperator.titre};
     this.setState({cooperators: newCooperators})
   }
 
@@ -454,9 +455,9 @@ class AdminModal extends React.Component {
                     {this.state.cooperators.map((cooperator, index) =>
                       <div key={index}>
                       <Col style={({marginBottom:'10px'})} key={index} sm={index > 0 ? 5 : 6}>
-                        <FormControl onChange={this.handleChangeCooperator.bind(this, index)} value={cooperator} componentClass="select">
+                        <FormControl onChange={this.handleChangeCooperator.bind(this, index)} value={cooperator._id} componentClass="select">
                           <option key="none" value="none">------</option>
-                          {this.allCooperators.map((c) => <option key={c.titre} value={c.titre}>{c.titre}</option>)}
+                          {this.allCooperators.map((c) => <option key={c._id} value={c._id}>{c.titre}</option>)}
                         </FormControl>
                       </Col>
                       {index > 0 && (<Col sm={1}><Button bsStyle="danger" onClick={this.deleteCooperator.bind(this, index)}>-</Button></Col>)}

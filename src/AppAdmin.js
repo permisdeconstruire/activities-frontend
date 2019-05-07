@@ -5,9 +5,10 @@ import 'font-awesome/css/font-awesome.min.css'
 
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 import 'react-datepicker/dist/react-datepicker.css'
+import { Row } from 'react-bootstrap';
 import './styles.css'
 import './prism.css'
-import {authFetch} from './common/utils'
+import {authFetch, logout} from './common/utils'
 import AdminCalendar from './admin/AdminCalendar'
 import AdminPedagogy from './admin/AdminPedagogy'
 import AdminEvent from './admin/AdminEvent'
@@ -47,10 +48,10 @@ class App extends React.Component {
         element = <FormsBuilder/>
       } else if(this.state.route.startsWith('#form')) {
         const formTitle = this.state.route.replace('#form_', '');
-        element = <FormViewer formType="pilote" formTitle={formTitle} api="/admin/pilotes" keyname="email"/>
+        element = <FormViewer formType="pilote" formTitle={formTitle} api="/admin/pilotes" keyname="pseudo"/>
         header = <AdminHeader whoami={this.state.whoami} />;
       } else if(this.state.route === '#cooperators') {
-        element = <FormViewer formTitle="Coopérateur" api="/admin/cooperators" keyname="titre"/>
+        element = <FormViewer formType="cooperator" formTitle="Coopérateur" api="/admin/cooperators" keyname="titre"/>
       } else if(this.state.route === '#pedagogy') {
         element = <AdminPedagogy />
       } else if(this.state.route === '#event') {

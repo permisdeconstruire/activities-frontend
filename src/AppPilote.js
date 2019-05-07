@@ -5,11 +5,12 @@ import 'font-awesome/css/font-awesome.min.css'
 
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 import 'react-datepicker/dist/react-datepicker.css'
+import { Row } from 'react-bootstrap';
 import './styles.css'
 import './prism.css'
 import PiloteCalendar from './pilote/PiloteCalendar'
 import PiloteHeader from './pilote/PiloteHeader'
-import {authFetch} from './common/utils'
+import {authFetch, logout} from './common/utils'
 
 class App extends React.Component {
 

@@ -122,7 +122,7 @@ class Pedagogy extends React.Component {
           <Col sm={6}>
             <FormControl onChange={this.handleChangePedagogy.bind(this, 'pillar')} value={this.props.pedagogy.pillar} componentClass="select">
               <option key="none" value="none">-- Pillier --</option>
-              {this.genPillarOptions(this.state.allPedagogy.find(p => p.level == this.props.pedagogy.level && p.category === this.props.pedagogy.category && p.subCategory === this.props.pedagogy.subCategory && p.objective === this.props.pedagogy.objective))}
+              {this.genPillarOptions(this.state.allPedagogy.find(p => p.level === this.props.pedagogy.level && p.category === this.props.pedagogy.category && p.subCategory === this.props.pedagogy.subCategory && p.objective === this.props.pedagogy.objective))}
             </FormControl>
           </Col>
         </FormGroup>
