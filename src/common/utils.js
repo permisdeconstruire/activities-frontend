@@ -42,8 +42,7 @@ function authFetch(url, options = {headers: {}}) {
   return fetch(url, newOptions)
     .then(res => res.json(res))
     .catch(e => {
-      throw(e);
-      // document.location.href = `${process.env.REACT_APP_BACKEND}/v0/login`;
+      document.location.href = `${process.env.REACT_APP_BACKEND}/v0/login`;
     })
 }
 
