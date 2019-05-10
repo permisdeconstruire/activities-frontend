@@ -17,7 +17,6 @@ const globalizeLocalizer = localizer(globalize)
 function convertToBigCalendarEvents(events, whoami) {
   return events.map(event => {
     const newEvent = event;
-    newEvent.id = newEvent._id;
     newEvent.start = new Date(newEvent.start)
     newEvent.end = new Date(newEvent.end)
     newEvent.isRegistered = false
@@ -62,8 +61,10 @@ class PiloteCalendar extends React.Component {
   }
 
   onSelectEvent(event) {
-    if(event.status !== 'Fermeture' && event.status !== 'Autonomie') {
-      this.setState({ show: true, currentEventId: event.id});
+    if(['Fermeture', 'Autonomie', 'Individuelle'].indexOf(event.status) === -1) {
+      this.setState({ show: true, currentEventId: event._id});
+    } else if(event.status === 'Individuelle') {
+      alert('Merci de contacter ton copilote pour l\'inscription à cette activité')
     }
   }
 

@@ -45,7 +45,7 @@ class PiloteModal extends React.Component {
 
   componentDidUpdate(prevProps, prevState) {
     if(prevProps.currentEventId !== this.props.currentEventId) {
-      const event = this.props.events.find(event => event.id === this.props.currentEventId)
+      const event = this.props.events.find(event => event._id === this.props.currentEventId)
       if(typeof(event) !== 'undefined') {
         const newState = this.defaultState();
         newState.pedagogy = JSON.parse(JSON.stringify(event.pedagogy));
@@ -68,7 +68,8 @@ class PiloteModal extends React.Component {
     authFetch(`${process.env.REACT_APP_BACKEND}/v0/pilote/activities/id/${this.props.currentEventId}`, {
       method: 'PUT',
       body: JSON.stringify({
-        action: 'register'
+        action: 'register',
+        pedagogy: this.state.pedagogy.filter(p => p.checked).map(p => p.objective),
       }),
       headers:{
         'Content-Type': 'application/json'
@@ -108,7 +109,7 @@ class PiloteModal extends React.Component {
   }
 
   render() {
-    const event = this.props.events.find(event => event.id === this.props.currentEventId)
+    const event = this.props.events.find(event => event._id === this.props.currentEventId)
     if(typeof(event) === 'undefined') {
       return (<></>);
     }

@@ -19,7 +19,6 @@ const globalizeLocalizer = localizer(globalize)
 function convertToBigCalendarEvents(events) {
   return events.map(event => {
     const newEvent = event;
-    newEvent.id = newEvent._id;
     newEvent.start = new Date(newEvent.start)
     newEvent.end = new Date(newEvent.end)
     return newEvent;
@@ -65,7 +64,7 @@ class AdminCalendar extends React.Component {
   }
 
   onSelectEvent(event) {
-    this.setState({ show: true, currentEventId: event.id});
+    this.setState({ show: true, currentEventId: event._id});
   }
 
   handleClose() {
@@ -73,7 +72,7 @@ class AdminCalendar extends React.Component {
   }
 
   handleSubmit(event) {
-    const id = event.event.id;
+    const id = event.event._id;
     const data = {
       start: event.start,
       end: event.end,

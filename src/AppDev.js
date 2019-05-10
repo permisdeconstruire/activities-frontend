@@ -48,6 +48,11 @@ class App extends React.Component {
 
   render() {
     if(this.state.whoami !== null) {
+      let name = this.state.whoami.email
+      if(this.state.whoami.pseudo) {
+        name = this.state.whoami.pseudo;
+      }
+
       let element;
       let header;
       if(this.state.route === '#admin') {
@@ -78,9 +83,10 @@ class App extends React.Component {
         <div className="app">
           {header && header}
           <div className="jumbotron">
-            <div className="container">
+            <img src="/logo.png" />
+            <div className="container" style={({display: 'inline-grid', textAlign: 'center'})}>
               <Row>
-                Bonjour {this.state.whoami.email}, bienvenue chez Permis de Construire. <a href="/" onClick={logout}>Se déconnecter</a>
+                Bonjour {name}, bienvenue chez Permis de Construire. <a href="/" onClick={logout}>Se déconnecter</a>
               </Row>
             </div>
           </div>

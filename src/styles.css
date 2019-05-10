@@ -20,12 +20,22 @@ a:active {
   text-decoration: none;
 }
 .jumbotron {
-  background-color: #eb691c;
-  color: white;
+  /*background-color: #eb691c;
+  color: white;*/
+  background-color: #f8f8f8;
+  color: #eb691c;
+  font-weight: bold;
 }
+
+.jumbotron img {
+  margin-left: 20px;
+}
+
 .jumbotron a {
+  margin-left: 20px;
+  font-weight: 100;
   font-size: 85%;
-  color: #e6e6e6;
+  color: #eb691c;
 }
 .contain {
   background-color: white;

@@ -42,9 +42,10 @@ class App extends React.Component {
       return (
         <div className="app">
           <div className="jumbotron">
-            <div className="container">
+            <img src="/logo.png" />
+            <div className="container" style={({display: 'inline-grid', textAlign: 'center'})}>
               <Row>
-                Bonjour {this.state.whoami.email}, bienvenue chez Permis de Construire. <a href="/" onClick={logout}>Se déconnecter</a>
+                Bonjour {this.state.whoami.pseudo}, bienvenue chez Permis de Construire. <a href="/" onClick={logout}>Se déconnecter</a>
               </Row>
             </div>
           </div>

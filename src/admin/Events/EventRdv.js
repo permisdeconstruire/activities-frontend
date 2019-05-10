@@ -21,20 +21,13 @@ class EventRdv extends React.Component {
 
   constructor(props, context) {
     super(props, context);
-    this.handleChangeStatus = this.handleChangeStatus.bind(this);
-    this.handleChangeJustificatif = this.handleChangeJustificatif.bind(this);
+    this.handleChange = this.handleChange.bind(this);
     this.state = this.defaultState();
   }
 
-  handleChangeStatus(event) {
+  handleChange(field, event){
     const newProps = this.props.data;
-    newProps.status = event.target.value
-    this.props.onChange(newProps)
-  }
-
-  handleChangeJustificatif(event) {
-    const newProps = this.props.data;
-    newProps.justificatif = event.target.value
+    newProps[field] = event.target.value
     this.props.onChange(newProps)
   }
 
@@ -43,10 +36,22 @@ class EventRdv extends React.Component {
       <>
         <FormGroup controlId="formHorizontalEventCourrier">
           <Col componentClass={ControlLabel} sm={4}>
+            But
+          </Col>
+          <Col sm={6}>
+            <FormControl onChange={this.handleChange.bind(this, 'type')} value={this.props.data.type} componentClass="select">
+              <option key="entretien" value="entretien">Entretien individuel</option>
+              <option key="accueil" value="accueil">Accueil</option>
+              <option key="autre" value="autre">Autre</option>
+            </FormControl>
+          </Col>
+        </FormGroup>
+        <FormGroup controlId="formHorizontalEventCourrier">
+          <Col componentClass={ControlLabel} sm={4}>
             Status
           </Col>
           <Col sm={6}>
-            <FormControl onChange={this.handleChangeStatus} value={this.props.data.status} componentClass="select">
+            <FormControl onChange={this.handleChange.bind(this, 'status')} value={this.props.data.status} componentClass="select">
               <option key="manque" value="manque">Manqué</option>
               <option key="retard" value="retard">En retard</option>
               <option key="present" value="present">Présent</option>
@@ -58,7 +63,7 @@ class EventRdv extends React.Component {
             Justificatif
           </Col>
           <Col sm={6}>
-            <FormControl onChange={this.handleChangeJustificatif} value={this.props.data.justificatif} componentClass="select">
+            <FormControl onChange={this.handleChange.bind(this, 'justificatif')} value={this.props.data.justificatif} componentClass="select">
               <option key="oui" value="oui">Oui</option>
               <option key="non" value="non">Non</option>
             </FormControl>

@@ -84,7 +84,7 @@ class FormViewer extends React.Component {
       fileData.forEach(fileDatum => {
         const parent = $(this.state.form.instanceContainers[0]).find(`input[name="${fileDatum.name}"]`).parent()
         const divUploadedFile = $('<div class="uploadedFile"></div>');
-        if(datum[fileDatum.name] !== '') {
+        if(typeof(datum[fileDatum.name]) !== 'undefined' && datum[fileDatum.name] !== '') {
           const mime = datum[fileDatum.name].split(';')[0].split(':')[1];
           let elem
           if(mime.startsWith('image')) {
@@ -101,7 +101,7 @@ class FormViewer extends React.Component {
         parent.append(divUploadedFile)
       })
     }
-
+    window.localStorage.setItem(`${this.props.formType}_id`, event.target.value);
     this.setState({form, selected: event.target.value})
   }
 
@@ -180,13 +180,18 @@ class FormViewer extends React.Component {
     Promise.all(filePromises)
       .then(files => {
         this.state.form.userData.filter(formLine => typeof(formLine.name) !== 'undefined').forEach(formLine => {
-          if(formLine.type === 'checkbox-group') {
-            data[formLine.name] = formLine.userData;
-            if(typeof(data[formLine.name]) === 'undefined') {
+          if(typeof(formLine.userData) === 'undefined') {
+            if(formLine.type === 'checkbox-group') {
               data[formLine.name] = [];
+            } else if(formLine.type === 'select') {
+              data[formLine.name] = formLine.values.find(value => value.selected).value;
+            } else {
+              alert('Problème avec le formulaire ' + JSON.stringify(formLine));
             }
           } else {
-            if(formLine.type === 'file') {
+            if(formLine.type === 'checkbox-group') {
+              data[formLine.name] = formLine.userData;
+            } else if(formLine.type === 'file') {
               const file = files.find(f => f.name === formLine.name);
               data[formLine.name] = file.data;
             } else {
@@ -243,7 +248,8 @@ class FormViewer extends React.Component {
       return authFetch(`${process.env.REACT_APP_BACKEND}/v0${this.props.api}`);
     })
     .then(res => {
-      this.setState({form, title, list: res, selected: 'none'})
+      const selected = window.localStorage.getItem(`${this.props.formType}_id`) || 'none';
+      this.setState({form, title, list: res, selected})
     })
   }
 
