@@ -40,8 +40,8 @@ class EventRdv extends React.Component {
           </Col>
           <Col sm={6}>
             <FormControl onChange={this.handleChange.bind(this, 'type')} value={this.props.data.type} componentClass="select">
-              <option key="entretien" value="entretien">Entretien individuel</option>
-              <option key="accueil" value="accueil">Accueil</option>
+              <option key="individuel" value="individuel">Entretien individuel</option>
+              <option key="accueil" value="accueil">Entretien d'accueil</option>
               <option key="autre" value="autre">Autre</option>
             </FormControl>
           </Col>

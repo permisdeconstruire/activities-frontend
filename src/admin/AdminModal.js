@@ -375,7 +375,7 @@ class AdminModal extends React.Component {
                     onSuggestionsClearRequested={this.onSuggestionsClearRequested.bind(this, 'theme')}
                     getSuggestionValue={getSuggestionValue}
                     renderSuggestion={renderSuggestion}
-                    inputProps={({placeholder: 'Visite entreprise', value: this.state.theme, onChange: this.handleChangeSuggestion.bind(this, {field: 'theme'})})}
+                    inputProps={({className:"form-control", placeholder: 'Visite entreprise', value: this.state.theme, onChange: this.handleChangeSuggestion.bind(this, {field: 'theme'})})}
                   />
                 </Col>
               </FormGroup>
@@ -415,13 +415,15 @@ class AdminModal extends React.Component {
                 </Col>
                 <Col sm={4}>
                   <DatePicker
+                    todayButton={"Aujourd'hui"}
                     selected={this.state.start}
                     onChange={this.handleChangeDate.bind(this, 'start')}
                     showTimeSelect
-                    showTimeSelectOnly
-                    locale='fr'
+                    timeFormat="HH:mm"
+                    timeIntervals={30}
                     dateFormat={dateFormat}
                     timeCaption="Heure"
+                    className="form-control"
                   />
                 </Col>
 
@@ -430,13 +432,15 @@ class AdminModal extends React.Component {
                 </Col>
                 <Col sm={4}>
                   <DatePicker
+                    todayButton={"Aujourd'hui"}
                     selected={this.state.end}
                     onChange={this.handleChangeDate.bind(this, 'end')}
                     showTimeSelect
-                    showTimeSelectOnly
-                    timeIntervals={15}
+                    timeFormat="HH:mm"
+                    timeIntervals={30}
                     dateFormat={dateFormat}
                     timeCaption="Heure"
+                    className="form-control"
                   />
                 </Col>
               </FormGroup>

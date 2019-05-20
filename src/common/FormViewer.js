@@ -217,6 +217,11 @@ class FormViewer extends React.Component {
         })
       })
       .then(res => {
+        if(res === 'Error') {
+          alert('Quelque chose s\'est mal passé !')
+        } else {
+          alert('Élément sauvegardé !')
+        }
         if(id === 'none') {
           id = res;
         }
@@ -224,7 +229,6 @@ class FormViewer extends React.Component {
       })
       .then(res => {
         this.setState({list: res, selected: id});
-        alert('Élément sauvegardé !')
       })
   }
 
@@ -250,6 +254,7 @@ class FormViewer extends React.Component {
     .then(res => {
       const selected = window.localStorage.getItem(`${this.props.formType}_id`) || 'none';
       this.setState({form, title, list: res, selected})
+      this.select({target: {value: selected}});
     })
   }
 
@@ -263,7 +268,7 @@ class FormViewer extends React.Component {
         <Col sm={2}>
           <FormControl onChange={this.select} value={this.state.selected} componentClass="select">
             <option key="none" value="none">----</option>
-            {this.state.list.map((datum) => <option key={datum._id} value={datum._id}>{datum[this.props.keyname]}</option>)}
+            {this.state.list.sort((a,b) => a.pseudo<b.pseudo ? -1 : 1).map((datum) => <option key={datum._id} value={datum._id}>{datum[this.props.keyname]}</option>)}
           </FormControl>
           <Button bsStyle="danger" onClick={this.delete}>Supprimer</Button>
         </Col>

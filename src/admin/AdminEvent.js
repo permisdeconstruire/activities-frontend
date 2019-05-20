@@ -18,8 +18,12 @@ import EventEvaluation from './Events/EventEvaluation'
 import EventDivers from './Events/EventDivers'
 import EventRdv from './Events/EventRdv'
 import EventAppel from './Events/EventAppel'
+import DatePicker from 'react-datepicker'
+import { registerLocale }  from 'react-datepicker'
+import fr from 'date-fns/locale/fr';
+registerLocale('fr', fr);
 
-
+const dateFormat = 'dd/MM/YYYY HH:mm'
 
 const types = ['evaluation', 'divers', 'rdv', 'appel', 'courrier']
 
@@ -29,8 +33,9 @@ class AdminEvent extends React.Component {
     return {
       type: '',
       comment: '',
+      date: new Date(),
       data: {},
-      pilote: 'none',
+      pilote: {_id: 'none', pseudo: 'none'},
       piloteList: [],
     };
   }
@@ -38,6 +43,7 @@ class AdminEvent extends React.Component {
   constructor(props, context) {
     super(props, context);
     this.handleChangeData = this.handleChangeData.bind(this);
+    this.handleChangeDate = this.handleChangeDate.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.state = this.defaultState();
@@ -54,7 +60,12 @@ class AdminEvent extends React.Component {
     const newState = this.state;
     if(field === 'pilote') {
       const selectedPilote = this.state.piloteList.find(pilote => pilote._id === event.target.value);
-      newState.pilote = {_id: selectedPilote._id, pseudo: selectedPilote.pseudo};
+      if(typeof(selectedPilote) === 'undefined') {
+        newState.pilote = {_id: 'none', pseudo: 'none'};
+      } else {
+        newState.pilote = {_id: selectedPilote._id, pseudo: selectedPilote.pseudo};
+      }
+
     } else {
       newState[field] = event.target.value
     }
@@ -66,12 +77,16 @@ class AdminEvent extends React.Component {
       } else if(event.target.value === 'divers') {
         newState.data = {title: ''}
       } else if(event.target.value === 'rdv') {
-        newState.data = {status: 'manque', justificatif: 'oui', type: 'entretien'}
+        newState.data = {status: 'manque', justificatif: 'oui', type: 'individuel'}
       } else if(event.target.value === 'appel') {
-        newState.data = {direction: 'in', who: '', answered: 'non'}
+        newState.data = {direction: 'out', who: '', answered: 'non'}
       }
     }
     this.setState(newState);
+  }
+
+  handleChangeDate(date) {
+    this.setState({date})
   }
 
   handleChangeData(data){
@@ -84,6 +99,7 @@ class AdminEvent extends React.Component {
       comment: this.state.comment,
       pilote: this.state.pilote,
       data: this.state.data,
+      date: this.state.date.toISOString(),
     }
     authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/events`, {
       method: 'POST',
@@ -93,11 +109,15 @@ class AdminEvent extends React.Component {
       }
     })
     .then(res => {
-      alert('Événement généré');
-      const piloteList = this.state.piloteList;
-      const newState = this.defaultState();
-      newState.piloteList = piloteList;
-      this.setState(newState);
+      if(res !== 'Error') {
+        alert('Événement généré');
+        const piloteList = this.state.piloteList;
+        const newState = this.defaultState();
+        newState.piloteList = piloteList;
+        this.setState(newState);
+      } else {
+        alert('Quelque chose s\'est mal passé');
+      }
     })
   }
 
@@ -135,6 +155,19 @@ class AdminEvent extends React.Component {
                 <option key="none" value="none">-- Pilote --</option>
                 {this.state.piloteList.map(pilote => <option key={pilote._id} value={pilote._id}>{pilote.pseudo}</option>)}
               </FormControl>
+            </Col>
+            <Col sm={4}>
+              <DatePicker
+                todayButton={"Aujourd'hui"}
+                selected={this.state.date}
+                onChange={this.handleChangeDate}
+                showTimeSelect
+                timeFormat="HH:mm"
+                timeIntervals={30}
+                dateFormat={dateFormat}
+                timeCaption="Heure"
+                className="form-control"
+              />
             </Col>
           </FormGroup>
           <FormGroup controlId="formHorizontalParticipants">

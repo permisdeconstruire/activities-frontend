@@ -157,7 +157,7 @@ class FormsBuilder extends React.Component {
             <Col sm={4}>
               <FormControl onChange={this.selectForm} value={this.state.selectedForm._id} componentClass="select">
                 <option key="none" value="none">-- Partir de zéro --</option>
-                {this.state.forms.map((form) => <option key={form._id} value={form._id}>{form.title}</option>)}
+                {this.state.forms.sort((a,b) => a.title < b.title ? -1 : 1).map((form) => <option key={form._id} value={form._id}>{form.title}</option>)}
               </FormControl>
             </Col>
             {this.state.selectedForm._id !== 'none' &&

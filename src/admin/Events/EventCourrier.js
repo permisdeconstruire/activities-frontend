@@ -40,6 +40,7 @@ class EventCourrier extends React.Component {
             <FormControl onChange={this.handleChange} value={this.props.data.status} componentClass="select">
               <option key="relance" value="relance">Relance</option>
               <option key="fin" value="fin">Fin</option>
+              <option key="autre" value="autre">Autre</option>
             </FormControl>
           </Col>
         </FormGroup>

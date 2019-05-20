@@ -41,7 +41,7 @@ class EventAppel extends React.Component {
           <Col sm={6}>
             <FormControl onChange={this.handleChange.bind(this, 'direction')} value={this.props.data.direction} componentClass="select">
               <option key="in" value="in">Reçu</option>
-              <option key="out" value="out">Donné</option>
+              <option key="out" value="out">Émis</option>
             </FormControl>
           </Col>
         </FormGroup>
