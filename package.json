@@ -27,6 +27,7 @@
     "build": "ln -fs AppPilote.js src/App.js && REACT_APP_BACKEND=https://api.pdc.bug.builders react-scripts build && tar cvzf build-pilote.tar.gz build ",
     "build-admin": "ln -fs AppAdmin.js src/App.js && REACT_APP_BACKEND=https://api.pdc.bug.builders react-scripts build && tar cvzf build-admin.tar.gz build",
     "build-public": "ln -fs AppPublic.js src/App.js && REACT_APP_BACKEND=https://api.pdc.bug.builders react-scripts build && tar cvzf build-public.tar.gz build",
+    "build-cooperator": "ln -fs AppCooperator.js src/App.js && REACT_APP_BACKEND=https://api.pdc.bug.builders react-scripts build && tar cvzf build-cooperator.tar.gz build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
