@@ -19,6 +19,11 @@ import {authFetch, colorPillar} from '../common/utils'
 registerLocale('fr', fr);
 
 const dateFormat = 'dd/MM/YYYY HH:mm'
+const evaluations = [
+  {name: 'Non aquis', value: 0},
+  {name: 'En cours d\'aquisition', value: 1},
+  {name: 'Aquis', value: 2},
+]
 
 class CooperatorModal extends React.Component {
 
@@ -26,21 +31,97 @@ class CooperatorModal extends React.Component {
     return {
       step: 0,
       pedagogy: [],
-      justification: '',
+      pilote: {_id: 'none', pseudo: '', pedagogy:[]},
+      comments: [],
+      evaluations: [],
     }
   }
 
   constructor(props, context) {
     super(props, context);
-
-    this.handleRegister = this.handleRegister.bind(this);
-    this.handleUnregister = this.handleUnregister.bind(this);
-    this.handleUnregistration = this.handleUnregistration.bind(this);
-    this.handleRegistration = this.handleRegistration.bind(this);
-    this.handleCheckPedagogy = this.handleCheckPedagogy.bind(this);
-    this.handleChangeJustification = this.handleChangeJustification.bind(this);
+    this.handleChangePilote = this.handleChangePilote.bind(this);
+    this.handleChangeEvaluation = this.handleChangeEvaluation.bind(this);
+    this.handleChangeComment = this.handleChangeComment.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleSubmitAbsent = this.handleSubmitAbsent.bind(this);
 
     this.state = this.defaultState();
+  }
+
+  handleSubmitAbsent(){
+    const data = {
+      pilote: {_id: this.state.pilote._id, pseudo: this.state.pilote.pseudo},
+      missed: true,
+    }
+    authFetch(`${process.env.REACT_APP_BACKEND}/v0/cooperator/activities/id/${this.props.currentEventId}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+      headers:{
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(res => {
+        const newState = this.defaultState();
+        const event = this.props.events.find(event => event.id === this.props.currentEventId)
+        newState.pedagogy = JSON.parse(JSON.stringify(event.pedagogy));
+        newState.pedagogy.forEach(a => {
+          newState.comments.push('')
+          newState.evaluations.push(-1)
+        })
+        this.setState(newState);
+      })
+  }
+
+  handleSubmit() {
+    const eventPromises = []
+    for(let i = 0; i < this.state.pedagogy.length; i += 1){
+      const data = {
+        pilote: {_id: this.state.pilote._id, pseudo: this.state.pilote.pseudo},
+        comment: this.state.comments[i],
+        data: {
+          ...this.state.pedagogy[i],
+          evaluation: this.state.evaluations[i],
+        }
+      }
+
+      eventPromises.push(authFetch(`${process.env.REACT_APP_BACKEND}/v0/cooperator/activities/id/${this.props.currentEventId}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+        headers:{
+          'Content-Type': 'application/json'
+        }
+      }))
+    }
+
+    Promise.all(eventPromises)
+      .then(res => {
+        const newState = this.defaultState();
+        const event = this.props.events.find(event => event.id === this.props.currentEventId)
+        newState.pedagogy = JSON.parse(JSON.stringify(event.pedagogy));
+        newState.pedagogy.forEach(a => {
+          newState.comments.push('')
+          newState.evaluations.push(-1)
+        })
+        this.setState(newState);
+      })
+  }
+
+  handleChangeEvaluation(index, {target}) {
+    const newEvaluations = this.state.evaluations;
+    newEvaluations[index] = parseInt(target.value, 10);
+    this.setState({evaluations: newEvaluations});
+  }
+
+  handleChangeComment(index, {target}) {
+    const newComments = this.state.comments;
+    newComments[index] = target.value;
+    this.setState({comments: newComments});
+  }
+
+  handleChangePilote({target}) {
+    const event = this.props.events.find(event => event._id === this.props.currentEventId)
+    const selectedPilote = event.participants.find(pilote => pilote._id === target.value);
+    this.setState({pilote: selectedPilote})
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -49,180 +130,91 @@ class CooperatorModal extends React.Component {
       if(typeof(event) !== 'undefined') {
         const newState = this.defaultState();
         newState.pedagogy = JSON.parse(JSON.stringify(event.pedagogy));
+        newState.pedagogy.forEach(a => {
+          newState.comments.push('')
+          newState.evaluations.push(-1)
+        })
         this.setState(newState);
       }
     }
   }
 
-  handleCheckPedagogy(index, event) {
-    const newPedagogy = this.state.pedagogy;
-    if(typeof(newPedagogy[index].checked) === 'undefined'){
-      newPedagogy[index].checked = false;
-    }
-    newPedagogy[index].checked = !newPedagogy[index].checked;
-
-    this.setState({pedagogy: newPedagogy});
-  }
-
-  handleRegister() {
-    authFetch(`${process.env.REACT_APP_BACKEND}/v0/pilote/activities/id/${this.props.currentEventId}`, {
-      method: 'PUT',
-      body: JSON.stringify({
-        action: 'register'
-      }),
-      headers:{
-        'Content-Type': 'application/json'
-      }
-    }).then(() => {
-      this.props.onClose();
-      this.props.refresh();
-    })
-  }
-
-  handleChangeJustification(event) {
-    this.setState({justification: event.target.value});
-  }
-
-  handleUnregister() {
-    authFetch(`${process.env.REACT_APP_BACKEND}/v0/pilote/activities/id/${this.props.currentEventId}`, {
-      method: 'PUT',
-      body: JSON.stringify({
-        action: 'unregister',
-        justification: this.state.justification,
-      }),
-      headers:{
-        'Content-Type': 'application/json'
-      }
-    }).then(() => {
-      this.props.onClose();
-      this.props.refresh();
-    })
-  }
-
-  handleRegistration() {
-    this.setState({step: 1})
-  }
-
-  handleUnregistration() {
-    this.setState({step: 2})
-  }
-
   render() {
-    const event = this.props.events.find(event => event.id === this.props.currentEventId)
+    const event = this.props.events.find(event => event._id === this.props.currentEventId)
     if(typeof(event) === 'undefined') {
       return (<></>);
     }
-    let participants = [];
-    if(typeof(event.participants) !== 'undefined'){
-       participants = event.participants;
-    }
-
-    let stepPanel;
-
-    if(this.state.step === 0){
-      stepPanel = (
-        <Panel>
-          <Panel.Heading>Participants</Panel.Heading>
-          <Panel.Body>
-            <Row>
-              <Col sm={6}>
-                Intervenant : {event.contributor}
-              </Col>
-              <Col sm={6}>
-                Copilote : {event.copilot}
-              </Col>
-            </Row>
-            <hr/>
-            <Row>
-              {
-                participants.map(participant => (
-                  <Col sm={6} key={participant}>
-                    {participant}
-                  </Col>
-                ))
-              }
-            </Row>
-          </Panel.Body>
-        </Panel>
-      )
-    } else if(this.state.step === 1) {
-      stepPanel = (
-        <Panel>
-          <Panel.Heading>Je souhaite travailler les compétences suivantes</Panel.Heading>
-          <Panel.Body>
-            <Form horizontal>
-              {
-                this.state.pedagogy.map((pedagogy, index) => (
-                  <>
-                  <Row title={pedagogy.pillar} className={`pedagogyRow`} key={`peda_${index}`}>
-                    <Col sm={12} style={({textAlign:'center'})}>
-                      {`${pedagogy.objective}`}
-                    </Col>
-                    <Col sm={5} style={({fontWeight:'bold'})} className={colorPillar(pedagogy.pillar)}>
-                      {pedagogy.pillar}
-                    </Col>
-                    <Col sm={5}>
-                    {
-                      Array.apply(null, {length: pedagogy.level}).map((k, i) => (
-                        <span key={`star_${i}`} className="fa fa-star starChecked"></span>
-                      ))
-                    }
-                    </Col>
-                    <Col sm={2}>
-                      <Button bsStyle={pedagogy.checked ? 'success' : 'default'} onClick={this.handleCheckPedagogy.bind(this, index)}>OK</Button>
-                    </Col>
-                  </Row>
-                  <hr />
-                  </>
-                ))
-              }
-            </Form>
-          </Panel.Body>
-        </Panel>
-      )
-    } else {
-      stepPanel = (
-        <Panel>
-          <Panel.Heading>Justification</Panel.Heading>
-          <Panel.Body>
-            <Form horizontal>
-              <FormControl style={({height:'200px'})} onChange={this.handleChangeJustification} componentClass="textarea" value={this.state.justification}  type="text" placeholder="Je ne peux plus venir car..." />
-            </Form>
-          </Panel.Body>
-        </Panel>
-      )
-    }
-
-    const allChecked = _.some(this.state.pedagogy, {checked: true})
     return (
       <Modal show={this.props.show} onHide={this.props.onClose}>
         <Modal.Header closeButton >
-          <Modal.Title>{event.title}</Modal.Title>
+          <Modal.Title><b>{event.theme}</b> - {event.title}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {stepPanel}
+          <Panel>
+            <Panel.Heading>
+              Évaluation du pilote
+
+                { (typeof(event.participants) !== 'undefined' && event.participants.length > 0)
+                  ?
+                    <FormControl onChange={this.handleChangePilote} value={this.state.pilote._id} componentClass="select">
+                      <option key="none" value="none">------</option>
+                      {event.participants.sort((a,b) => a.pseudo<b.pseudo ? -1 : 1).map((p) => <option key={p._id} value={p._id}>{p.pseudo}</option>)}
+                    </FormControl>
+                  :
+                    <> - Aucun inscrit</>
+                }
+
+            </Panel.Heading>
+            <Panel.Body>
+              <Form horizontal>
+                {
+                  this.state.pedagogy.sort((a,b) => a.category+a.subCategory<b.category+a.subCategory ? -1 : 1).map((pedagogy, index) => (
+                    <div key={`peda_${index}`}>
+                    <Row title={pedagogy.pillar} key={`peda_${index}`}>
+                      <Col sm={12} style={({fontWeight:'bold', lineHeight: '20px'})} className={colorPillar(pedagogy.pillar)}>
+                        {
+                          this.state.pilote.pedagogy.indexOf(pedagogy.objective) !== -1 ?
+                            <><i className="fa fa-star starChecked"></i>{pedagogy.category}</>
+                          :
+                            <>{pedagogy.category}</>
+                        }
+                      </Col>
+                      <Col sm={12} style={({lineHeight: '20px', marginLeft:'30px', marginBottom: '20px'})} className={colorPillar(pedagogy.pillar)}>
+                        {pedagogy.subCategory}
+                      </Col>
+                      <Col sm={2}><b>Objectif</b></Col>
+                      <Col sm={10} style={({textAlign:'justify', marginBottom: '10px'})}>
+                         {`${pedagogy.objective}`}
+                      </Col>
+                      <Col sm={2}><b>Critère</b></Col>
+                      <Col sm={10} style={({textAlign:'justify', marginBottom: '20px'})}>
+                        {`${pedagogy.indicator}`}
+                      </Col>
+                      <Col sm={8}>
+                        <FormControl onChange={this.handleChangeComment.bind(this, index)} value={this.state.comments[index]} type="text" placeholder="Commentaires" />
+                      </Col>
+                      <Col sm={4}>
+                        <FormControl onChange={this.handleChangeEvaluation.bind(this, index)} value={this.state.evaluations[index]} componentClass="select">
+                          <option key="none" value="-1">-- Evaluation --</option>
+                          {evaluations.map(evaluation => <option key={evaluation.name} value={evaluation.value}>{evaluation.name}</option>)}
+                        </FormControl>
+                      </Col>
+                    </Row>
+                    <hr />
+                    </div>
+                  ))
+                }
+              </Form>
+            </Panel.Body>
+          </Panel>
         </Modal.Body>
         <Modal.Footer>
-          {this.state.step === 0 &&
-            <>
-              {event.isRegistered ?
-                <Button onClick={this.handleUnregistration} bsStyle="danger">Se désinscrire</Button>
-              :
-                <Button bsStyle="success" onClick={this.handleRegistration}>S'inscrire</Button>
-              }
-            </>
-          }
-          {this.state.step === 1 && allChecked &&
-            <Button bsStyle="success" onClick={this.handleRegister}>Je m'engage à venir à l'activité</Button>
-          }
-          {this.state.step === 2 &&
-            <>
-              <Button bsStyle="default" onClick={this.props.onClose}>Annuler</Button>
-              {this.state.justification.length > 10 &&
-                <Button onClick={this.handleUnregister} bsStyle="danger">Je me désinscris</Button>
-              }
-            </>
-          }
+        { this.state.pilote._id !== 'none' &&
+          <>
+            <Button onClick={this.handleSubmitAbsent} bsStyle="danger">{this.state.pilote.pseudo} était absent</Button>
+            <Button onClick={this.handleSubmit} bsStyle="success">Envoyer</Button>
+          </>
+        }
         </Modal.Footer>
       </Modal>
     )

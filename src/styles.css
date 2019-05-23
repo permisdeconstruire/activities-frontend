@@ -363,6 +363,7 @@ h4 a:focus .anchor-icon {
 
 .starChecked {
   color: orange;
+  margin-right: 5px;
 }
 
 .greenPillar {

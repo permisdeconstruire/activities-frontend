@@ -8,6 +8,7 @@ import EventWrapper from '../common/EventWrapper'
 import Event from '../common/Event'
 import TimeSlotWrapper from '../common/TimeSlotWrapper'
 import CooperatorModal from './CooperatorModal'
+import {authFetch} from '../common/utils'
 
 require('globalize/lib/cultures/globalize.culture.fr')
 const globalizeLocalizer = localizer(globalize)
@@ -21,7 +22,7 @@ function convertToBigCalendarEvents(events, whoami) {
     newEvent.end = new Date(newEvent.end)
     newEvent.isCooperator = false
     if(typeof(whoami) !== 'undefined' && typeof(event.cooperators) !== 'undefined') {
-      newEvent.isCooperator = event.cooperators.indexOf(whoami.email) !== -1;
+      newEvent.isCooperator = event.cooperators.findIndex(cooperator => cooperator._id === whoami.roles.cooperator) !== -1;
     }
     return newEvent;
   })
@@ -49,8 +50,7 @@ class CooperatorCalendar extends React.Component {
   }
 
   refresh() {
-    fetch(`${process.env.REACT_APP_BACKEND}/v0/activities`)
-      .then(res => res.json())
+    authFetch(`${process.env.REACT_APP_BACKEND}/v0/cooperator/activities`)
       .then(events => {
         this.setState({events: convertToBigCalendarEvents(events, this.props.whoami)})
       })

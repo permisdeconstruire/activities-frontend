@@ -47,6 +47,7 @@ function renderSuggestion(suggestion) {
 class AdminModal extends React.Component {
 
   allCooperators = []
+  allPilotes = []
 
   defaultState() {
     return {
@@ -58,11 +59,13 @@ class AdminModal extends React.Component {
       theme: '',
       cooperators: ['none'],
       pedagogy: [],
+      participants: [],
       cost: 0,
       estimated: 0,
       place: '',
       annotation: '',
       step:0,
+      pilote: {_id: 'none', pseudo:''},
       published: false,
       copyActivity: 'none',
       suggestions: {
@@ -90,6 +93,11 @@ class AdminModal extends React.Component {
     this.addCooperator = this.addCooperator.bind(this);
     this.deleteCooperator = this.deleteCooperator.bind(this);
     this.handleChangeCooperator = this.handleChangeCooperator.bind(this);
+    this.handleChangePilote = this.handleChangePilote.bind(this);
+
+    this.handleRegisterPilote = this.handleRegisterPilote.bind(this);
+    this.handleUnregisterPilote = this.handleUnregisterPilote.bind(this);
+
 
     this.copyActivity = this.copyActivity.bind(this);
     this.onSuggestionsFetchRequested = this.onSuggestionsFetchRequested.bind(this);
@@ -103,6 +111,10 @@ class AdminModal extends React.Component {
     listCooperators()
       .then(res => {
         this.allCooperators = res;
+        return authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/pilotes`)
+      })
+      .then(res => {
+        this.allPilotes = res;
       })
   }
 
@@ -118,6 +130,14 @@ class AdminModal extends React.Component {
       }
       newState.step = 0;
       this.setState(newState);
+    } else {
+      const newState = this.props.events.find(e => e._id === this.props.currentEventId)
+      if(typeof(newState) !== 'undefined' && (typeof(this.state.participants) !== typeof(newState.participants) || (typeof(newState.participants) !== 'undefined' && this.state.participants.toString() !== newState.participants.toString()))){
+        if(typeof(newState.participants) === 'undefined'){
+          newState.participants = [];
+        }
+        this.setState(newState);
+      }
     }
   }
 
@@ -141,6 +161,36 @@ class AdminModal extends React.Component {
       newState.published = false;
       this.setState(newState);
     }
+  }
+
+  handleUnregisterPilote(participant) {
+    authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/activities/id/${this.state._id}/pilote`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        pilote: participant,
+        action: 'unregister',
+      }),
+      headers:{
+        'Content-Type': 'application/json'
+      }
+    }).then(() => {
+      this.props.refresh();
+    })
+  }
+
+  handleRegisterPilote() {
+    authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/activities/id/${this.state._id}/pilote`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        pilote: this.state.pilote,
+        action: 'register',
+      }),
+      headers:{
+        'Content-Type': 'application/json'
+      }
+    }).then(() => {
+      this.props.refresh();
+    })
   }
 
   deletePedagogy(index) {
@@ -171,6 +221,11 @@ class AdminModal extends React.Component {
     const newState = this.state;
     newState.cooperators.push({_id: 'none', titre:'none'})
     this.setState(newState)
+  }
+
+  handleChangePilote(event) {
+    const selectedPilote = this.allPilotes.find(pilote => pilote._id === event.target.value);
+    this.setState({pilote: selectedPilote})
   }
 
   handleChangeCooperator(index, event) {
@@ -244,7 +299,6 @@ class AdminModal extends React.Component {
   onSuggestionsFetchRequested({field, index}, { value }){
     const newState = {suggestions: this.state.suggestions}
     newState.suggestions[field] = this.getSuggestions(field, index, value)
-    console.log(field, newState.suggestions[field])
     this.setState(newState);
   }
 
@@ -366,7 +420,7 @@ class AdminModal extends React.Component {
                 </Col>
 
                 <Col componentClass={ControlLabel} sm={2}>
-                  Theme
+                  Activité
                 </Col>
                 <Col sm={4}>
                   <Autosuggest
@@ -420,7 +474,7 @@ class AdminModal extends React.Component {
                     onChange={this.handleChangeDate.bind(this, 'start')}
                     showTimeSelect
                     timeFormat="HH:mm"
-                    timeIntervals={30}
+                    timeIntervals={15}
                     dateFormat={dateFormat}
                     timeCaption="Heure"
                     className="form-control"
@@ -437,7 +491,7 @@ class AdminModal extends React.Component {
                     onChange={this.handleChangeDate.bind(this, 'end')}
                     showTimeSelect
                     timeFormat="HH:mm"
-                    timeIntervals={30}
+                    timeIntervals={15}
                     dateFormat={dateFormat}
                     timeCaption="Heure"
                     className="form-control"
@@ -456,7 +510,7 @@ class AdminModal extends React.Component {
                   <Col style={({marginBottom:'10px'})} key={index} sm={index > 0 ? 5 : 6}>
                     <FormControl onChange={this.handleChangeCooperator.bind(this, index)} value={cooperator._id} componentClass="select">
                       <option key="none" value="none">------</option>
-                      {this.allCooperators.map((c) => <option key={c._id} value={c._id}>{c.titre}</option>)}
+                      {this.allCooperators.sort((a,b) => a.titre<b.titre ? -1 : 1).map((c) => <option key={c._id} value={c._id}>{c.titre}</option>)}
                     </FormControl>
                   </Col>
                   {index > 0 && (<Col sm={1}><Button bsStyle="danger" onClick={this.deleteCooperator.bind(this, index)}>-</Button></Col>)}
@@ -522,22 +576,37 @@ class AdminModal extends React.Component {
       )
     } else if(this.state.step === 2) {
       form = (
-        <Row>
-          {
-            this.state.participants.map(participant => (
-              <Col sm={6} key={participant._id}>
-                {participant.pseudo}
-              </Col>
-            ))
-          }
-        </Row>
+        <>
+          <Row>
+            {
+              this.state.participants.sort((a,b) => a.pseudo<b.pseudo ? -1 : 1).map(participant => (
+                <Col sm={6} key={participant._id}>
+                  {participant.pseudo}
+                  <Button bsStyle="danger" onClick={this.handleUnregisterPilote.bind(this, participant)}>X</Button>
+                </Col>
+              ))
+            }
+          </Row>
+          <hr />
+          <Row>
+            <Col sm={8}>
+              <FormControl onChange={this.handleChangePilote} value={this.state.pilote._id} componentClass="select">
+                <option key="none" value="none">------</option>
+                {this.allPilotes.sort((a,b) => a.pseudo<b.pseudo ? -1 : 1).map((p) => <option key={p._id} value={p._id}>{p.pseudo}</option>)}
+              </FormControl>
+            </Col>
+            <Col sm={3}>
+              <Button bsStyle="primary" onClick={this.handleRegisterPilote}>Ajouter participant</Button>
+            </Col>
+          </Row>
+        </>
       )
     }
 
     return (
       <Modal show={this.props.show} onHide={this.props.onClose}>
         <Modal.Header closeButton>
-          <Modal.Title>{this.state.title !== '' ? this.state.title : 'Nouvelle activité'}</Modal.Title>
+          <Modal.Title><b>{this.state.theme !== '' ? this.state.theme : ''}</b> - {this.state.title !== '' ? this.state.title : 'Nouvelle activité'}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {form}

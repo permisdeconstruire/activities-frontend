@@ -153,7 +153,7 @@ class AdminEvent extends React.Component {
             <Col sm={4}>
               <FormControl onChange={this.handleChange.bind(this, 'pilote')} value={this.state.pilote._id} componentClass="select">
                 <option key="none" value="none">-- Pilote --</option>
-                {this.state.piloteList.map(pilote => <option key={pilote._id} value={pilote._id}>{pilote.pseudo}</option>)}
+                {this.state.piloteList.sort((a,b) => a.pseudo<b.pseudo ? -1 : 1).map(pilote => <option key={pilote._id} value={pilote._id}>{pilote.pseudo}</option>)}
               </FormControl>
             </Col>
             <Col sm={4}>
@@ -163,7 +163,7 @@ class AdminEvent extends React.Component {
                 onChange={this.handleChangeDate}
                 showTimeSelect
                 timeFormat="HH:mm"
-                timeIntervals={30}
+                timeIntervals={15}
                 dateFormat={dateFormat}
                 timeCaption="Heure"
                 className="form-control"

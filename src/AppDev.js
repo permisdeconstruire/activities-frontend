@@ -12,6 +12,7 @@ import './prism.css'
 import PiloteCalendar from './pilote/PiloteCalendar'
 import PiloteHeader from './pilote/PiloteHeader'
 import {authFetch, logout} from './common/utils'
+import PublicCalendar from './public/PublicCalendar'
 import AdminCalendar from './admin/AdminCalendar'
 import AdminHeader from './admin/AdminHeader'
 import CooperatorCalendar from './cooperator/CooperatorCalendar'
@@ -61,6 +62,9 @@ class App extends React.Component {
       } else if(this.state.route === '#cooperator') {
         element = <CooperatorCalendar whoami={this.state.whoami}/>
         // header = <CooperatorHeader whoami={this.state.whoami} />
+      } else if(this.state.route === '#public') {
+        element = <PublicCalendar />
+        // header = <CooperatorHeader whoami={this.state.whoami} />
       } else if(this.state.route === '#forms') {
         element = <FormsBuilder/>
         header = <AdminHeader whoami={this.state.whoami} />;
@@ -86,7 +90,7 @@ class App extends React.Component {
             <img src="/logo.png" />
             <div className="container" style={({display: 'inline-grid', textAlign: 'center'})}>
               <Row>
-                Bonjour {name}, bienvenue chez Permis de Construire. <a href="/" onClick={logout}>Se déconnecter</a>
+                Bonjour {name}, bienvenue chez Permis de Construire. <a href="/" onClick={logout}>Se déconnecter</a> <a href={`${process.env.REACT_APP_BACKEND}/v0/activities.pdf`} target="_blank"> Télécharger l'agenda </a>
               </Row>
             </div>
           </div>

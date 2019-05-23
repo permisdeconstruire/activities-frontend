@@ -150,16 +150,16 @@ class PiloteModal extends React.Component {
           <Panel.Body>
             <Form horizontal>
               {
-                this.state.pedagogy.map((pedagogy, index) => (
+                this.state.pedagogy.sort((a,b) => a.category<b.category ? -1 : 1).map((pedagogy, index) => (
                   <div key={`peda_${index}`}>
-                  <Row title={pedagogy.pillar} className={`pedagogyRow`} key={`peda_${index}`}>
-                    <Col sm={10} style={({fontWeight:'bold'})} className={colorPillar(pedagogy.pillar)}>
+                  <Row title={pedagogy.pillar} key={`peda_${index}`}>
+                    <Col sm={10} style={({fontWeight:'bold', lineHeight: '34px'})} className={colorPillar(pedagogy.pillar)}>
                       {pedagogy.category}
                     </Col>
                     <Col sm={2}>
                       <Button bsStyle={pedagogy.checked ? 'success' : 'default'} onClick={this.handleCheckPedagogy.bind(this, index)}>OK</Button>
                     </Col>
-                    <Col sm={12} style={({textAlign:'center'})}>
+                    <Col sm={12} style={({textAlign:'justify'})}>
                       {`${pedagogy.objective}`}
                     </Col>
                   </Row>
@@ -188,7 +188,7 @@ class PiloteModal extends React.Component {
     return (
       <Modal show={this.props.show} onHide={this.props.onClose}>
         <Modal.Header closeButton >
-          <Modal.Title>{event.title}</Modal.Title>
+          <Modal.Title><b>{event.theme}</b> - {event.title}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {stepPanel}

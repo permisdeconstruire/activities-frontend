@@ -185,8 +185,6 @@ class FormViewer extends React.Component {
               data[formLine.name] = [];
             } else if(formLine.type === 'select') {
               data[formLine.name] = formLine.values.find(value => value.selected).value;
-            } else {
-              alert('Problème avec le formulaire ' + JSON.stringify(formLine));
             }
           } else {
             if(formLine.type === 'checkbox-group') {
@@ -268,7 +266,7 @@ class FormViewer extends React.Component {
         <Col sm={2}>
           <FormControl onChange={this.select} value={this.state.selected} componentClass="select">
             <option key="none" value="none">----</option>
-            {this.state.list.sort((a,b) => a.pseudo<b.pseudo ? -1 : 1).map((datum) => <option key={datum._id} value={datum._id}>{datum[this.props.keyname]}</option>)}
+            {this.state.list.sort((a,b) => a[this.props.keyname]<b[this.props.keyname] ? -1 : 1).map((datum) => <option key={datum._id} value={datum._id}>{datum[this.props.keyname]}</option>)}
           </FormControl>
           <Button bsStyle="danger" onClick={this.delete}>Supprimer</Button>
         </Col>
