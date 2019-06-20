@@ -18,6 +18,7 @@ import AdminHeader from './admin/AdminHeader'
 import CooperatorCalendar from './cooperator/CooperatorCalendar'
 import CooperatorHeader from './cooperator/CooperatorHeader'
 import AdminPedagogy from './admin/AdminPedagogy'
+import AdminPilotes from './admin/AdminPilotes'
 import AdminEvent from './admin/AdminEvent'
 import FormsBuilder from './admin/FormsBuilder'
 import FormViewer from './common/FormViewer'
@@ -71,6 +72,9 @@ class App extends React.Component {
       } else if(this.state.route.startsWith('#form')) {
         const formTitle = this.state.route.replace('#form_', '');
         element = <FormViewer formType="pilote" formTitle={formTitle} api="/admin/pilotes" keyname="pseudo"/>
+        header = <AdminHeader whoami={this.state.whoami} />;
+      } else if(this.state.route === '#pilotes') {
+        element = <AdminPilotes />
         header = <AdminHeader whoami={this.state.whoami} />;
       } else if(this.state.route === '#cooperators') {
         element = <FormViewer formType="cooperator" formTitle="Coopérateur" api="/admin/cooperators" keyname="titre"/>

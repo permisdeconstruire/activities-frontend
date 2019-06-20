@@ -50,8 +50,9 @@ class AdminHeader extends React.Component {
             )}
           </NavDropdown>
           <NavItem eventKey={4} href="/#cooperators">Gérer les coopérateurs</NavItem>
-          <NavItem eventKey={4} href="/#event">Générer un événement</NavItem>
-          <NavItem eventKey={5} href="/#forms">Éditer les formulaires</NavItem>
+          <NavItem eventKey={5} href="/#event">Générer un événement</NavItem>
+          <NavItem eventKey={6} href="/#forms">Éditer les formulaires</NavItem>
+          <NavItem eventKey={7} href="/#pilotes">Voir les pilotes</NavItem>
         </Nav>
       </Navbar>
     );

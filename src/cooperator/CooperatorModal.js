@@ -72,7 +72,7 @@ class CooperatorModal extends React.Component {
       })
   }
 
-  handleSubmit() {
+  handleSubmit(special) {
     const eventPromises = []
     for(let i = 0; i < this.state.pedagogy.length; i += 1){
       const data = {
@@ -84,7 +84,7 @@ class CooperatorModal extends React.Component {
         }
       }
 
-      eventPromises.push(authFetch(`${process.env.REACT_APP_BACKEND}/v0/cooperator/activities/id/${this.props.currentEventId}`, {
+      eventPromises.push(authFetch(`${process.env.REACT_APP_BACKEND}/v0/cooperator/activities/id/${this.props.currentEventId}?special=${special}`, {
         method: 'PUT',
         body: JSON.stringify(data),
         headers:{
@@ -121,7 +121,12 @@ class CooperatorModal extends React.Component {
   handleChangePilote({target}) {
     const event = this.props.events.find(event => event._id === this.props.currentEventId)
     const selectedPilote = event.participants.find(pilote => pilote._id === target.value);
-    this.setState({pilote: selectedPilote})
+    if(typeof(selectedPilote) === 'undefined') {
+      this.setState({pilote: {_id: 'none', pseudo: '', pedagogy: []}})
+    } else {
+      this.setState({pilote: selectedPilote})
+    }
+
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -168,7 +173,7 @@ class CooperatorModal extends React.Component {
             <Panel.Body>
               <Form horizontal>
                 {
-                  this.state.pedagogy.sort((a,b) => a.category+a.subCategory<b.category+a.subCategory ? -1 : 1).map((pedagogy, index) => (
+                  this.state.pedagogy.sort((a,b) => a.category+a.subCategory+a.objective<b.category+b.subCategory+b.objective ? -1 : 1).map((pedagogy, index) => (
                     <div key={`peda_${index}`}>
                     <Row title={pedagogy.pillar} key={`peda_${index}`}>
                       <Col sm={12} style={({fontWeight:'bold', lineHeight: '20px'})} className={colorPillar(pedagogy.pillar)}>
@@ -212,7 +217,8 @@ class CooperatorModal extends React.Component {
         { this.state.pilote._id !== 'none' &&
           <>
             <Button onClick={this.handleSubmitAbsent} bsStyle="danger">{this.state.pilote.pseudo} était absent</Button>
-            <Button onClick={this.handleSubmit} bsStyle="success">Envoyer</Button>
+            <Button onClick={this.handleSubmit.bind(this, 'late')} bsStyle="primary">Évaluer mais en retard</Button>
+            <Button onClick={this.handleSubmit} bsStyle="success">Évaluer</Button>
           </>
         }
         </Modal.Footer>

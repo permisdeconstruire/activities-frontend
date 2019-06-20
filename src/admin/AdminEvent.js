@@ -77,9 +77,9 @@ class AdminEvent extends React.Component {
       } else if(event.target.value === 'divers') {
         newState.data = {title: ''}
       } else if(event.target.value === 'rdv') {
-        newState.data = {status: 'manque', justificatif: 'oui', type: 'individuel'}
+        newState.data = {status: 'present', justificatif: 'oui', type: 'individuel'}
       } else if(event.target.value === 'appel') {
-        newState.data = {direction: 'out', who: '', answered: 'non'}
+        newState.data = {direction: 'out', who: '', answered: 'oui'}
       }
     }
     this.setState(newState);

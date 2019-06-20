@@ -61,10 +61,17 @@ class PiloteCalendar extends React.Component {
   }
 
   onSelectEvent(event) {
-    if(['Fermeture', 'Autonomie', 'Individuelle'].indexOf(event.status) === -1) {
-      this.setState({ show: true, currentEventId: event._id});
-    } else if(event.status === 'Individuelle') {
-      alert('Merci de contacter ton copilote pour l\'inscription à cette activité')
+    const tooLate = moment(event.start).subtract(1, 'days');
+    if(moment().isBefore(tooLate)){
+      if(['Fermeture', 'Autonomie', 'Individuelle'].indexOf(event.status) === -1) {
+        this.setState({ show: true, currentEventId: event._id});
+      } else if(event.status === 'Individuelle') {
+        if(event.isRegistered){
+          alert('Inscription à cette activité validée')
+        } else {
+          alert('Merci de contacter ton copilote pour l\'inscription à cette activité')
+        }
+      }
     }
   }
 

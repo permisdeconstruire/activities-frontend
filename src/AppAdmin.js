@@ -13,6 +13,7 @@ import AdminCalendar from './admin/AdminCalendar'
 import AdminPedagogy from './admin/AdminPedagogy'
 import AdminEvent from './admin/AdminEvent'
 import AdminHeader from './admin/AdminHeader'
+import AdminPilotes from './admin/AdminPilotes'
 import FormsBuilder from './admin/FormsBuilder'
 import FormViewer from './common/FormViewer'
 
@@ -50,6 +51,8 @@ class App extends React.Component {
         const formTitle = this.state.route.replace('#form_', '');
         element = <FormViewer formType="pilote" formTitle={formTitle} api="/admin/pilotes" keyname="pseudo"/>
         header = <AdminHeader whoami={this.state.whoami} />;
+      } else if(this.state.route === '#pilotes') {
+        element = <AdminPilotes />
       } else if(this.state.route === '#cooperators') {
         element = <FormViewer formType="cooperator" formTitle="Coopérateur" api="/admin/cooperators" keyname="titre"/>
       } else if(this.state.route === '#pedagogy') {

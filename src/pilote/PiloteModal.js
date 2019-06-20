@@ -150,7 +150,7 @@ class PiloteModal extends React.Component {
           <Panel.Body>
             <Form horizontal>
               {
-                this.state.pedagogy.sort((a,b) => a.category<b.category ? -1 : 1).map((pedagogy, index) => (
+                this.state.pedagogy.sort((a,b) => a.category+a.subCategory+a.objective<b.category+b.subCategory+b.objective ? -1 : 1).map((pedagogy, index) => (
                   <div key={`peda_${index}`}>
                   <Row title={pedagogy.pillar} key={`peda_${index}`}>
                     <Col sm={10} style={({fontWeight:'bold', lineHeight: '34px'})} className={colorPillar(pedagogy.pillar)}>
