@@ -23,7 +23,7 @@ function convertToBigCalendarEvents(events, whoami) {
     if(typeof(whoami) !== 'undefined' && typeof(event.participants) !== 'undefined') {
       newEvent.isRegistered = event.participants.findIndex(participant => participant._id === whoami.roles.pilote) !== -1;
     }
-    newEvent.pedagogy = newEvent.pedagogy.filter(pedagogy => whoami.levels[pedagogy.category] === 0 || pedagogy.level <= whoami.levels[pedagogy.category])
+
     return newEvent;
   })
 }
@@ -64,7 +64,13 @@ class PiloteCalendar extends React.Component {
     const tooLate = moment(event.start).subtract(1, 'days');
     if(moment().isBefore(tooLate)){
       if(['Fermeture', 'Autonomie', 'Individuelle'].indexOf(event.status) === -1) {
-        this.setState({ show: true, currentEventId: event._id});
+        if(this.props.whoami.pillar === event.status && this.props.whoami.level === event.level) {
+          this.setState({ show: true, currentEventId: event._id});
+        } else if(['Bien vivre'].indexOf(event.status) === -1) {
+          this.setState({ show: true, currentEventId: event._id});
+        } else {
+          alert('Ceci n\'est pas une activité de ton groupe');
+        }
       } else if(event.status === 'Individuelle') {
         if(event.isRegistered){
           alert('Inscription à cette activité validée')

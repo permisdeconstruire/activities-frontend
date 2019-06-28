@@ -54,7 +54,6 @@ class EventEvaluation extends React.Component {
             </FormControl>
           </Col>
         </FormGroup>
-        <Col style={({textAlign:'center'})}>{this.props.data.indicator}</Col>
       </>
     )
   }

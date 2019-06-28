@@ -29,6 +29,7 @@ const status = [
   'Autonomie',
   'Socio-éducatif',
   'Formative',
+  'Bien vivre',
   'Individuelle',
 ]
 
@@ -56,6 +57,7 @@ class AdminModal extends React.Component {
       start: new Date(),
       end: new Date(),
       status: status[0],
+      level: 0,
       theme: '',
       cooperators: ['none'],
       pedagogy: [],
@@ -98,6 +100,7 @@ class AdminModal extends React.Component {
     this.handleRegisterPilote = this.handleRegisterPilote.bind(this);
     this.handleUnregisterPilote = this.handleUnregisterPilote.bind(this);
 
+    this.genCopyActivity = this.genCopyActivity.bind(this);
 
     this.copyActivity = this.copyActivity.bind(this);
     this.onSuggestionsFetchRequested = this.onSuggestionsFetchRequested.bind(this);
@@ -151,6 +154,7 @@ class AdminModal extends React.Component {
       const activity = this.props.events.find(activity => activity._id === event.target.value)
       newState.title = activity.title;
       newState.status = activity.status;
+      newState.level = activity.level;
       newState.theme = activity.theme;
       newState.pedagogy = activity.pedagogy;
       newState.cost = activity.cost;
@@ -249,7 +253,11 @@ class AdminModal extends React.Component {
 
   handleChange(field, event){
     const newState = {}
-    newState[field] = event.target.value
+    if(['level'].indexOf(field) !== -1) {
+      newState[field] = parseInt(event.target.value, 10);
+    } else {
+      newState[field] = event.target.value
+    }
     this.setState(newState);
   }
 
@@ -320,13 +328,14 @@ class AdminModal extends React.Component {
       start: this.state.start,
       end: this.state.end,
       status: this.state.status,
+      level: this.state.level,
       theme: this.state.theme,
       pedagogy: this.state.pedagogy,
       cost: this.state.cost,
       estimated: this.state.estimated,
       place: this.state.place,
       annotation: this.state.annotation,
-      cooperators: this.state.cooperators,
+      cooperators: this.state.cooperators[0] === 'none' ? [] : this.state.cooperators,
       published: this.state.published,
     }
 
@@ -372,12 +381,40 @@ class AdminModal extends React.Component {
     this.setState({step})
   }
 
+  genCopyActivity() {
+    _.uniqBy(this.props.events.filter(event => this.state.level === '0' || (this.state.level === event.level && this.state.pillar === event.pillar)), 'theme').map((event) => <option key={event._id} value={event._id}>{event.theme}</option>)
+  }
+
   render() {
     let form;
 
     if(this.state.step === 0) {
       form = (
         <Form horizontal>
+          <Panel>
+            <Panel.Heading>Parcours</Panel.Heading>
+            <Panel.Body>
+              <FormGroup controlId="formHorizontalStatusAndTheme">
+                <Col componentClass={ControlLabel} sm={2}>
+                  Status
+                </Col>
+                <Col sm={4}>
+                  <FormControl onChange={this.handleChange.bind(this, 'status')} value={this.state.status} componentClass="select">
+                    {status.map((status) => <option key={status} value={status}>{status}</option>)}
+                  </FormControl>
+                </Col>
+                <Col componentClass={ControlLabel} sm={2}>
+                  Niveau
+                </Col>
+                <Col sm={4}>
+                  <FormControl onChange={this.handleChange.bind(this, 'level')} value={this.state.level} componentClass="select">
+                    {[0,1,2,3,4].map(l => <option key={l} value={l}>{l}</option>)}
+                  </FormControl>
+                </Col>
+              </FormGroup>
+            </Panel.Body>
+          </Panel>
+
           <FormGroup controlId="formHorizontalClone">
           <Col componentClass={ControlLabel} sm={4}>
             Copier ancienne activité
@@ -385,7 +422,7 @@ class AdminModal extends React.Component {
           <Col sm={8}>
             <FormControl onChange={this.copyActivity} value={this.state.copyActivity} componentClass="select">
               <option key="none" value="none">-- Partir de zéro --</option>
-              {_.uniqBy(this.props.events, 'theme').map((event) => <option key={event._id} value={event._id}>{event.theme}</option>)}
+              {this.genCopyActivity()}
             </FormControl>
           </Col>
         </FormGroup>
@@ -411,18 +448,9 @@ class AdminModal extends React.Component {
               </FormGroup>
               <FormGroup controlId="formHorizontalStatusAndTheme">
                 <Col componentClass={ControlLabel} sm={2}>
-                  Status
-                </Col>
-                <Col sm={4}>
-                  <FormControl onChange={this.handleChange.bind(this, 'status')} value={this.state.status} componentClass="select">
-                    {status.map((status) => <option key={status} value={status}>{status}</option>)}
-                  </FormControl>
-                </Col>
-
-                <Col componentClass={ControlLabel} sm={2}>
                   Activité
                 </Col>
-                <Col sm={4}>
+                <Col sm={10}>
                   <Autosuggest
                     suggestions={this.state.suggestions.theme}
                     onSuggestionsFetchRequested={this.onSuggestionsFetchRequested.bind(this, {field: 'theme'})}
@@ -551,7 +579,7 @@ class AdminModal extends React.Component {
             <Panel.Body>
               {this.state.pedagogy.map((pedagogy, index) =>
                 <div key={pedagogy.category+pedagogy.level+pedagogy.subCategory+index}>
-                  <Pedagogy pedagogy={pedagogy} onChange={this.handleChangePedagogy.bind(this, index)} />
+                  <Pedagogy pedagogy={pedagogy} onChange={this.handleChangePedagogy.bind(this, index)} fixedPillar={this.state.status} fixedLevel={this.state.level} />
                   <FormGroup style={({textAlign:'center'})}>
                     <Col sm={0}>
                       <Button bsStyle="danger" onClick={this.deletePedagogy.bind(this, index)}>Supprimer</Button>

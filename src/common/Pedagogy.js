@@ -53,12 +53,16 @@ class Pedagogy extends React.Component {
     const newPedagogy = this.props.pedagogy;
     newPedagogy[field] = event.target.value;
     if(field === 'objective') {
-      const obj = this.state.allPedagogy.find(p => p.category === this.props.pedagogy.category && p.subCategory === this.props.pedagogy.subCategory && p.objective === this.props.pedagogy.objective)
+      const obj = this.state.allPedagogy.find(p => p.objective === this.props.pedagogy.objective)
       if(typeof(obj) !== 'undefined') {
         newPedagogy.indicator = obj.indicator;
         newPedagogy.level = obj.level;
-        if(obj.pillars.length === 1){
-          newPedagogy.pillar = obj.pillars[0];
+        newPedagogy.category = obj.category;
+        newPedagogy.subCategory = obj.subCategory;
+        if(obj.pillars.indexOf(this.props.fixedPillar) !== -1){
+          newPedagogy.pillar = this.props.fixedPillar;
+        } else {
+          newPedagogy.pillar = 'none';
         }
       }
     }
@@ -83,19 +87,31 @@ class Pedagogy extends React.Component {
   }
 
   render() {
+    let allPedagogy = this.state.allPedagogy;
+    if(typeof(this.props.fixedPillar) !== 'undefined') {
+      allPedagogy = allPedagogy.filter(p => p.pillars.indexOf(this.props.fixedPillar) !== -1)
+    }
+
+    if(allPedagogy.length === 0) {
+      allPedagogy = this.state.allPedagogy.filter(p => typeof(this.props.fixedLevel) === 'undefined' || this.props.fixedLevel === 0 || p.level === this.props.fixedLevel)
+    } else {
+      if(typeof(this.props.fixedLevel) !== 'undefined' && this.props.fixedLevel !== 0) {
+        allPedagogy = allPedagogy.filter(p => p.level === this.props.fixedLevel)
+      }
+    }
     return (
       <>
         <FormGroup controlId="formHorizontalPedagogyCategory">
           <Col sm={6}>
             <FormControl onChange={this.handleChangePedagogy.bind(this, 'category')} value={this.props.pedagogy.category} componentClass="select">
               <option key="none" value="none">-- Domaine --</option>
-              {_.uniqBy(this.state.allPedagogy, 'category').map((p, j) => <option key={`category-${j}`} value={p.category}>{p.category}</option>)}
+              {_.uniqBy(allPedagogy, 'category').map((p, j) => <option key={`category-${j}`} value={p.category}>{p.category}</option>)}
             </FormControl>
           </Col>
           <Col sm={6}>
             <FormControl onChange={this.handleChangePedagogy.bind(this, 'subCategory')} value={this.props.pedagogy.subCategory} componentClass="select">
               <option key="none" value="none">-- Sous-domaine --</option>
-              {_.uniqBy(this.state.allPedagogy.filter(p => p.category === this.props.pedagogy.category), 'subCategory').map((p, j) => <option key={`subCategory-${j}`} value={p.subCategory}>{p.subCategory}</option>)}
+              {_.uniqBy(allPedagogy.filter(p => this.props.pedagogy.category === 'none' || p.category === this.props.pedagogy.category), 'subCategory').map((p, j) => <option key={`subCategory-${j}`} value={p.subCategory}>{p.subCategory}</option>)}
             </FormControl>
           </Col>
         </FormGroup>
@@ -103,27 +119,13 @@ class Pedagogy extends React.Component {
           <Col sm={12}>
             <FormControl onChange={this.handleChangePedagogy.bind(this, 'objective')} value={this.props.pedagogy.objective} componentClass="select">
               <option key="none" value="none">-- Objectif --</option>
-              {_.uniqBy(this.state.allPedagogy.filter(p => p.category === this.props.pedagogy.category && p.subCategory === this.props.pedagogy.subCategory), 'objective').map((p, j) => <option key={`objective-${j}`} value={p.objective}>{p.objective}</option>)}
+              {_.uniqBy(allPedagogy.filter(p => (this.props.pedagogy.category === 'none' || p.category === this.props.pedagogy.category) && (this.props.pedagogy.subCategory === 'none' || p.subCategory === this.props.pedagogy.subCategory)), 'objective').map((p, j) => <option key={`objective-${j}`} value={p.objective}>{p.objective}</option>)}
             </FormControl>
           </Col>
         </FormGroup>
-        <FormGroup controlId="formHorizontalPedagogyLevel">
-          <Col componentClass={ControlLabel} sm={3}>
-            Niveau {this.props.pedagogy.level}
-          </Col>
-          <Col sm={9}>
+        <FormGroup controlId="formHorizontalPedagogyObjective">
+          <Col sm={12}>
             {this.props.pedagogy.indicator}
-          </Col>
-        </FormGroup>
-        <FormGroup controlId="formHorizontalPedagogyPillar">
-          <Col componentClass={ControlLabel} sm={4}>
-            Lier l'objectif
-          </Col>
-          <Col sm={6}>
-            <FormControl onChange={this.handleChangePedagogy.bind(this, 'pillar')} value={this.props.pedagogy.pillar} componentClass="select">
-              <option key="none" value="none">-- Pillier --</option>
-              {this.genPillarOptions(this.state.allPedagogy.find(p => p.level === this.props.pedagogy.level && p.category === this.props.pedagogy.category && p.subCategory === this.props.pedagogy.subCategory && p.objective === this.props.pedagogy.objective))}
-            </FormControl>
           </Col>
         </FormGroup>
       </>

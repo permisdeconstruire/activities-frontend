@@ -43,15 +43,15 @@ class CooperatorModal extends React.Component {
     this.handleChangeEvaluation = this.handleChangeEvaluation.bind(this);
     this.handleChangeComment = this.handleChangeComment.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleSubmitAbsent = this.handleSubmitAbsent.bind(this);
+    this.handleSubmitSpecial = this.handleSubmitSpecial.bind(this);
 
     this.state = this.defaultState();
   }
 
-  handleSubmitAbsent(){
+  handleSubmitSpecial(activityAction){
     const data = {
       pilote: {_id: this.state.pilote._id, pseudo: this.state.pilote.pseudo},
-      missed: true,
+      activityAction,
     }
     authFetch(`${process.env.REACT_APP_BACKEND}/v0/cooperator/activities/id/${this.props.currentEventId}`, {
       method: 'PUT',
@@ -72,8 +72,9 @@ class CooperatorModal extends React.Component {
       })
   }
 
-  handleSubmit(special) {
+  handleSubmit(activityAction) {
     const eventPromises = []
+    this.handleSubmitSpecial(activityAction);
     for(let i = 0; i < this.state.pedagogy.length; i += 1){
       const data = {
         pilote: {_id: this.state.pilote._id, pseudo: this.state.pilote.pseudo},
@@ -84,7 +85,7 @@ class CooperatorModal extends React.Component {
         }
       }
 
-      eventPromises.push(authFetch(`${process.env.REACT_APP_BACKEND}/v0/cooperator/activities/id/${this.props.currentEventId}?special=${special}`, {
+      eventPromises.push(authFetch(`${process.env.REACT_APP_BACKEND}/v0/cooperator/activities/id/${this.props.currentEventId}`, {
         method: 'PUT',
         body: JSON.stringify(data),
         headers:{
@@ -175,7 +176,7 @@ class CooperatorModal extends React.Component {
                 {
                   this.state.pedagogy.sort((a,b) => a.category+a.subCategory+a.objective<b.category+b.subCategory+b.objective ? -1 : 1).map((pedagogy, index) => (
                     <div key={`peda_${index}`}>
-                    <Row title={pedagogy.pillar} key={`peda_${index}`}>
+                    <Row key={`peda_${index}`}>
                       <Col sm={12} style={({fontWeight:'bold', lineHeight: '20px'})} className={colorPillar(pedagogy.pillar)}>
                         {
                           this.state.pilote.pedagogy.indexOf(pedagogy.objective) !== -1 ?
@@ -216,9 +217,9 @@ class CooperatorModal extends React.Component {
         <Modal.Footer>
         { this.state.pilote._id !== 'none' &&
           <>
-            <Button onClick={this.handleSubmitAbsent} bsStyle="danger">{this.state.pilote.pseudo} était absent</Button>
+            <Button onClick={this.handleSubmitSpecial.bind(this, 'missed')} bsStyle="danger">{this.state.pilote.pseudo} était absent</Button>
             <Button onClick={this.handleSubmit.bind(this, 'late')} bsStyle="primary">Évaluer mais en retard</Button>
-            <Button onClick={this.handleSubmit} bsStyle="success">Évaluer</Button>
+            <Button onClick={this.handleSubmit.bind(this, 'done')} bsStyle="success">Évaluer</Button>
           </>
         }
         </Modal.Footer>

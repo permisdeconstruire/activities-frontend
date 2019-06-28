@@ -73,7 +73,7 @@ class AdminEvent extends React.Component {
       if(event.target.value === 'courrier') {
         newState.data = {status: 'relance'}
       } else if(event.target.value === 'evaluation') {
-        newState.data = {}
+        newState.data = {category: 'none', subCategory: 'none', objective: 'none', pillar: 'none'}
       } else if(event.target.value === 'divers') {
         newState.data = {title: ''}
       } else if(event.target.value === 'rdv') {

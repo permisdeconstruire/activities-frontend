@@ -152,7 +152,7 @@ class PiloteModal extends React.Component {
               {
                 this.state.pedagogy.sort((a,b) => a.category+a.subCategory+a.objective<b.category+b.subCategory+b.objective ? -1 : 1).map((pedagogy, index) => (
                   <div key={`peda_${index}`}>
-                  <Row title={pedagogy.pillar} key={`peda_${index}`}>
+                  <Row key={`peda_${index}`}>
                     <Col sm={10} style={({fontWeight:'bold', lineHeight: '34px'})} className={colorPillar(pedagogy.pillar)}>
                       {pedagogy.category}
                     </Col>
@@ -203,7 +203,7 @@ class PiloteModal extends React.Component {
                 {this.state.pedagogy.length > 0 ?
                   <Button bsStyle="success" onClick={this.handleRegistration}>S'inscrire</Button>
                 :
-                  <Button bsStyle="default">Tu ne peux pas encore t'inscrire à cette activité</Button>
+                  <Button bsStyle="success" onClick={this.handleRegister}>Je m'engage à venir à l'activité</Button>
                 }
               </>
               }
