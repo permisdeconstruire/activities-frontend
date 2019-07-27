@@ -112,7 +112,7 @@ class FormViewer extends React.Component {
         method: 'DELETE'
       })
       .then(res => {
-        return authFetch(`${process.env.REACT_APP_BACKEND}/v0${this.props.api}`);
+        return authFetch(`${process.env.REACT_APP_BACKEND}/v0${this.props.api}${this.props.special}`);
       })
       .then(res => {
         const newUserData = this.state.form.userData;
@@ -223,7 +223,7 @@ class FormViewer extends React.Component {
         if(id === 'none') {
           id = res;
         }
-        return authFetch(`${process.env.REACT_APP_BACKEND}/v0${this.props.api}`);
+        return authFetch(`${process.env.REACT_APP_BACKEND}/v0${this.props.api}${this.props.special}`);
       })
       .then(res => {
         this.setState({list: res, selected: id});
@@ -247,7 +247,8 @@ class FormViewer extends React.Component {
       form = $(this.fv.current).formRender({
         formData: res.formData
       });
-      return authFetch(`${process.env.REACT_APP_BACKEND}/v0${this.props.api}`);
+      console.log(this.props);
+      return authFetch(`${process.env.REACT_APP_BACKEND}/v0${this.props.api}${this.props.special}`);
     })
     .then(res => {
       const selected = window.localStorage.getItem(`${this.props.formType}_id`) || 'none';

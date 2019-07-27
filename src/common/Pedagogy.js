@@ -56,14 +56,9 @@ class Pedagogy extends React.Component {
       const obj = this.state.allPedagogy.find(p => p.objective === this.props.pedagogy.objective)
       if(typeof(obj) !== 'undefined') {
         newPedagogy.indicator = obj.indicator;
-        newPedagogy.level = obj.level;
         newPedagogy.category = obj.category;
         newPedagogy.subCategory = obj.subCategory;
-        if(obj.pillars.indexOf(this.props.fixedPillar) !== -1){
-          newPedagogy.pillar = this.props.fixedPillar;
-        } else {
-          newPedagogy.pillar = 'none';
-        }
+        newPedagogy.type = obj.type;
       }
     }
     this.props.onChange(newPedagogy);
@@ -89,7 +84,7 @@ class Pedagogy extends React.Component {
   render() {
     let allPedagogy = this.state.allPedagogy;
     if(typeof(this.props.fixedPillar) !== 'undefined') {
-      allPedagogy = allPedagogy.filter(p => p.pillars.indexOf(this.props.fixedPillar) !== -1)
+      allPedagogy = allPedagogy.filter(p => p.pillar === this.props.fixedPillar)
     }
 
     if(allPedagogy.length === 0) {
@@ -124,6 +119,9 @@ class Pedagogy extends React.Component {
           </Col>
         </FormGroup>
         <FormGroup controlId="formHorizontalPedagogyObjective">
+          <Col sm={12}>
+            <b>{this.props.pedagogy.type}</b>
+          </Col>
           <Col sm={12}>
             {this.props.pedagogy.indicator}
           </Col>

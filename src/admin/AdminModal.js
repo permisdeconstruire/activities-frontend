@@ -24,14 +24,14 @@ const dateFormat = 'dd/MM/YYYY HH:mm'
 
 const skills = require('../common/skills.json')
 
+const pillars = ['Les Soins pour Soi', 'Booster sa candidature', 'La Relation', 'Insertion sociale', 'Projet professionnel'];
+
 const status = [
   'Fermeture',
   'Autonomie',
   'Socio-éducatif',
-  'Formative',
-  'Bien vivre',
-  'Individuelle',
-]
+  'Individuelle'
+].concat(pillars)
 
 function getSuggestionValue(suggestion) {
   return suggestion
@@ -205,7 +205,7 @@ class AdminModal extends React.Component {
 
   addPedagogy() {
     const newState = this.state;
-    newState.pedagogy.push({category: 'none', subCategory: 'none', objective: 'none', pillar: 'none'})
+    newState.pedagogy.push({category: 'none', subCategory: 'none', objective: 'none'})
     this.setState(newState)
   }
 
@@ -366,27 +366,21 @@ class AdminModal extends React.Component {
     }
   }
 
-  genPillarOptions(objective) {
-    if(typeof(objective) !== 'undefined'){
-      return (
-      <>
-        {objective.pillars.map(pillar => <option key={pillar} value={pillar}>{pillar}</option>)}
-      </>
-      )
-    }
-
-  }
-
   handleNavigation(step) {
     this.setState({step})
   }
 
   genCopyActivity() {
-    _.uniqBy(this.props.events.filter(event => this.state.level === '0' || (this.state.level === event.level && this.state.pillar === event.pillar)), 'theme').map((event) => <option key={event._id} value={event._id}>{event.theme}</option>)
+    if(this.state.level === 0) {
+      return _.uniqBy(this.props.events.filter(event => pillars.indexOf(event.status) === -1), 'theme').map((event) => <option key={event._id} value={event._id}>{event.theme}</option>)
+    } else {
+      return _.uniqBy(this.props.events.filter(event => this.state.level === event.level && this.state.status === event.status), 'theme').map((event) => <option key={event._id} value={event._id}>{event.theme}</option>)
+    }
   }
 
   render() {
     let form;
+    console.log(this.state);
 
     if(this.state.step === 0) {
       form = (
@@ -437,15 +431,6 @@ class AdminModal extends React.Component {
                   <input type="checkbox" className="btn-sm" checked={this.state.published ? 'checked' : ''} onChange={this.handleChangePublished}/>
                 </Col>
               </FormGroup>
-              <FormGroup controlId="formHorizontalTitle">
-
-                <Col componentClass={ControlLabel} sm={2}>
-                  Titre
-                </Col>
-                <Col sm={10}>
-                  <FormControl value={this.state.title} onChange={this.handleChange.bind(this, 'title')} type="text" placeholder="Nouvelle activité" />
-                </Col>
-              </FormGroup>
               <FormGroup controlId="formHorizontalStatusAndTheme">
                 <Col componentClass={ControlLabel} sm={2}>
                   Activité
@@ -459,6 +444,14 @@ class AdminModal extends React.Component {
                     renderSuggestion={renderSuggestion}
                     inputProps={({className:"form-control", placeholder: 'Visite entreprise', value: this.state.theme, onChange: this.handleChangeSuggestion.bind(this, {field: 'theme'})})}
                   />
+                </Col>
+              </FormGroup>
+              <FormGroup controlId="formHorizontalTitle">
+                <Col componentClass={ControlLabel} sm={2}>
+                  Titre
+                </Col>
+                <Col sm={10}>
+                  <FormControl value={this.state.title} onChange={this.handleChange.bind(this, 'title')} type="text" placeholder="Nouvelle activité" />
                 </Col>
               </FormGroup>
 
@@ -579,7 +572,7 @@ class AdminModal extends React.Component {
             <Panel.Body>
               {this.state.pedagogy.map((pedagogy, index) =>
                 <div key={pedagogy.category+pedagogy.level+pedagogy.subCategory+index}>
-                  <Pedagogy pedagogy={pedagogy} onChange={this.handleChangePedagogy.bind(this, index)} fixedPillar={this.state.status} fixedLevel={this.state.level} />
+                  <Pedagogy pedagogy={pedagogy} onChange={this.handleChangePedagogy.bind(this, index)} fixedLevel={this.state.level} fixedPillar={this.state.status} />
                   <FormGroup style={({textAlign:'center'})}>
                     <Col sm={0}>
                       <Button bsStyle="danger" onClick={this.deletePedagogy.bind(this, index)}>Supprimer</Button>

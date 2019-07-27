@@ -49,12 +49,13 @@ class App extends React.Component {
         element = <FormsBuilder/>
       } else if(this.state.route.startsWith('#form')) {
         const formTitle = this.state.route.replace('#form_', '');
-        element = <FormViewer formType="pilote" formTitle={formTitle} api="/admin/pilotes" keyname="pseudo"/>
+        console.log(formTitle)
+        element = <FormViewer formType="pilote" formTitle={formTitle} api="/admin/pilotes" keyname="pseudo" special="?filter=ph_statut:(%221-Orienté%22,%222-Contacté%22,%223-Accueilli%22,%224-Suivi%22)"/>
         header = <AdminHeader whoami={this.state.whoami} />;
       } else if(this.state.route === '#pilotes') {
         element = <AdminPilotes />
       } else if(this.state.route === '#cooperators') {
-        element = <FormViewer formType="cooperator" formTitle="Coopérateur" api="/admin/cooperators" keyname="titre"/>
+        element = <FormViewer formType="cooperator" formTitle="Coopérateur" api="/admin/cooperators" keyname="titre" special=""/>
       } else if(this.state.route === '#pedagogy') {
         element = <AdminPedagogy />
       } else if(this.state.route === '#event') {

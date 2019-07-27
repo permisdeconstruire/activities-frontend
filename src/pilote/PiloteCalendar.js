@@ -66,7 +66,7 @@ class PiloteCalendar extends React.Component {
       if(['Fermeture', 'Autonomie', 'Individuelle'].indexOf(event.status) === -1) {
         if(this.props.whoami.pillar === event.status && this.props.whoami.level === event.level) {
           this.setState({ show: true, currentEventId: event._id});
-        } else if(['Bien vivre'].indexOf(event.status) === -1) {
+        } else if(['Les soins pour soi', 'Booster sa candidature', 'La relation', 'L\'insertion sociale', 'Projet professionnel'].indexOf(event.status) === -1) {
           this.setState({ show: true, currentEventId: event._id});
         } else {
           alert('Ceci n\'est pas une activité de ton groupe');

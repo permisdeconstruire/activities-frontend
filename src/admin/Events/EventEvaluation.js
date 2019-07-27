@@ -42,7 +42,7 @@ class EventEvaluation extends React.Component {
   render() {
     return (
       <>
-        <Pedagogy pedagogy={this.props.data} onChange={this.props.onChange} />
+        <Pedagogy pedagogy={this.props.data} onChange={this.props.onChange} fixedLevel={this.props.level} />
         <FormGroup controlId="formHorizontalPedagogyNote">
           <Col componentClass={ControlLabel} sm={4}>
             Évaluation

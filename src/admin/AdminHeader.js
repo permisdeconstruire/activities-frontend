@@ -45,7 +45,7 @@ class AdminHeader extends React.Component {
         <Nav>
           <NavItem eventKey={1} href="#admin">Gérer l'agenda</NavItem>
           <NavDropdown eventKey={2} title="Gérer les pilotes" id="basic-nav-dropdown" onClick={this.getForms}>
-            {this.state.forms.filter(form => form.type === 'pilote').map((form, id) =>
+            {this.state.forms.filter(form => form.type === 'pilote').sort((a,b) => a.title<b.title ? -1 : 1).map((form, id) =>
               <MenuItem key={id} eventKey={2+(id/10)} href={`/#form_${form.title}`}>{form.title}</MenuItem>
             )}
           </NavDropdown>

@@ -61,9 +61,9 @@ class AdminEvent extends React.Component {
     if(field === 'pilote') {
       const selectedPilote = this.state.piloteList.find(pilote => pilote._id === event.target.value);
       if(typeof(selectedPilote) === 'undefined') {
-        newState.pilote = {_id: 'none', pseudo: 'none'};
+        newState.pilote = {_id: 'none', pseudo: 'none', level: 0, pillar: 'none'};
       } else {
-        newState.pilote = {_id: selectedPilote._id, pseudo: selectedPilote.pseudo};
+        newState.pilote = {_id: selectedPilote._id, pseudo: selectedPilote.pseudo, pillar: (typeof(selectedPilote.pillar) !== 'undefined' && selectedPilote.pillar !== 'Coup de pouce') ? selectedPilote.pillar : 'none', level: (typeof(selectedPilote.level) !== 'undefined' ? parseInt(selectedPilote.level, 10) : 0)};
       }
 
     } else {
@@ -73,7 +73,7 @@ class AdminEvent extends React.Component {
       if(event.target.value === 'courrier') {
         newState.data = {status: 'relance'}
       } else if(event.target.value === 'evaluation') {
-        newState.data = {category: 'none', subCategory: 'none', objective: 'none', pillar: 'none'}
+        newState.data = {category: 'none', subCategory: 'none', objective: 'none'}
       } else if(event.target.value === 'divers') {
         newState.data = {title: ''}
       } else if(event.target.value === 'rdv') {
@@ -98,7 +98,7 @@ class AdminEvent extends React.Component {
       type: this.state.type,
       comment: this.state.comment,
       pilote: this.state.pilote,
-      data: this.state.data,
+      data: this.state.type === 'evaluation' ? {...this.state.data, pillar: this.state.pilote.pillar} : this.state.data,
       date: this.state.date.toISOString(),
     }
     authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/events`, {
@@ -126,7 +126,7 @@ class AdminEvent extends React.Component {
       return <EventCourrier data={this.state.data} onChange={this.handleChangeData} />
     }
     if(type === 'evaluation'){
-      return <EventEvaluation data={this.state.data} onChange={this.handleChangeData} />
+      return <EventEvaluation data={this.state.data} onChange={this.handleChangeData} level={this.state.pilote.level}/>
     }
     if(type === 'divers'){
       return <EventDivers data={this.state.data} onChange={this.handleChangeData} />
