@@ -23,7 +23,6 @@ import AdminEvent from './admin/AdminEvent'
 import FormsBuilder from './admin/FormsBuilder'
 import FormViewer from './common/FormViewer'
 
-
 class App extends React.Component {
 
   constructor(props, context) {
@@ -43,7 +42,6 @@ class App extends React.Component {
     window.addEventListener("hashchange", this.changeRoute, false);
     authFetch(`${process.env.REACT_APP_BACKEND}/v0/whoami`)
       .then(whoami => {
-        console.log(whoami);
         this.setState({whoami})
       })
   }
@@ -62,7 +60,7 @@ class App extends React.Component {
         header = <AdminHeader whoami={this.state.whoami} />;
       } else if(this.state.route === '#cooperator') {
         element = <CooperatorCalendar whoami={this.state.whoami}/>
-        // header = <CooperatorHeader whoami={this.state.whoami} />
+        header = <CooperatorHeader whoami={this.state.whoami} />
       } else if(this.state.route === '#public') {
         element = <PublicCalendar />
         // header = <CooperatorHeader whoami={this.state.whoami} />
@@ -71,7 +69,7 @@ class App extends React.Component {
         header = <AdminHeader whoami={this.state.whoami} />;
       } else if(this.state.route.startsWith('#form')) {
         const formTitle = this.state.route.replace('#form_', '');
-        element = <FormViewer formType="pilote" formTitle={formTitle} api="/admin/pilotes" keyname="pseudo" special="?filter=ph_statut:(%221-Orienté%22,%222-Contacté%22,%223-Accueilli%22,%224-Suivi%22)"/>
+        element = <FormViewer formType="pilote" formTitle={formTitle} api="/admin/pilotes" keyname="pseudo" special="?filter=NOT%20ph_statut%3A%28%22Termin%C3%A9%20Jamais%20vu%22%2C%22Termin%C3%A9%20Accueilli%22%2C%22Pas%20d%27effet%20imm%C3%A9diat%22%2C%22Projet%20de%20vie%20valid%C3%A9%22%2C%20%22Projet%20de%20vie%20travaill%C3%A9%22%29"/>
         header = <AdminHeader whoami={this.state.whoami} />;
       } else if(this.state.route === '#pilotes') {
         element = <AdminPilotes />
@@ -82,11 +80,15 @@ class App extends React.Component {
       } else if(this.state.route === '#pedagogy') {
         element = <AdminPedagogy />
       } else if(this.state.route === '#event') {
-        element = <AdminEvent />
+        element = <AdminEvent type="admin"/>
         header = <AdminHeader whoami={this.state.whoami} />;
+      } else if(this.state.route === '#cooperator-event') {
+        element = <AdminEvent type="cooperator" />
+        header = <CooperatorHeader whoami={this.state.whoami} />;
       } else {
         element = <PiloteCalendar whoami={this.state.whoami}/>
       }
+      const jwt = window.localStorage.getItem('jwtPDC');
       return (
         <div className="app">
           {header && header}
@@ -94,7 +96,7 @@ class App extends React.Component {
             <img src="/logo.png" />
             <div className="container" style={({display: 'inline-grid', textAlign: 'center'})}>
               <Row>
-                Bonjour {name}, bienvenue chez Permis de Construire. <a href="/" onClick={logout}>Se déconnecter</a> <a href={`${process.env.REACT_APP_BACKEND}/v0/activities.pdf`} target="_blank"> Télécharger l'agenda </a>
+                Bonjour {name}, bienvenue chez Permis de Construire. <a href="/" onClick={logout}>Se déconnecter</a> <a href={`${process.env.REACT_APP_BACKEND}/v0/activities.pdf?token=${jwt}`} target="_blank"> Télécharger l'agenda </a>
               </Row>
             </div>
           </div>

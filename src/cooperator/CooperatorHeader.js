@@ -24,7 +24,7 @@ class CooperatorHeader extends React.Component {
       <Navbar>
         <Nav>
           <NavItem eventKey={1} href="#cooperator">Gérer l'agenda</NavItem>
-          <NavItem eventKey={4} href="/#event">Générer un événement</NavItem>
+          <NavItem eventKey={4} href="#cooperator-event">Générer un événement</NavItem>
         </Nav>
       </Navbar>
     );

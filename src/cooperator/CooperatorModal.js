@@ -15,14 +15,15 @@ import {
 import DatePicker from 'react-datepicker'
 import { registerLocale }  from 'react-datepicker'
 import fr from 'date-fns/locale/fr';
-import {authFetch, colorPillar} from '../common/utils'
+import {authFetch} from '../common/utils'
 registerLocale('fr', fr);
 
 const dateFormat = 'dd/MM/YYYY HH:mm'
 const evaluations = [
-  {name: 'Non aquis', value: 0},
-  {name: 'En cours d\'aquisition', value: 1},
-  {name: 'Aquis', value: 2},
+  {name: 'Non évalué', value: 0},
+  {name: 'Non réalisé', value: 1},
+  {name: 'Partiellement réalisé', value: 2},
+  {name: 'Réalisé', value: 3},
 ]
 
 class CooperatorModal extends React.Component {
@@ -177,7 +178,7 @@ class CooperatorModal extends React.Component {
                   this.state.pedagogy.sort((a,b) => a.category+a.subCategory+a.objective<b.category+b.subCategory+b.objective ? -1 : 1).map((pedagogy, index) => (
                     <div key={`peda_${index}`}>
                     <Row key={`peda_${index}`}>
-                      <Col sm={12} style={({fontWeight:'bold', lineHeight: '20px'})} className={colorPillar(pedagogy.pillar)}>
+                      <Col sm={12} style={({fontWeight:'bold', lineHeight: '20px'})}>
                         {
                           this.state.pilote.pedagogy.indexOf(pedagogy.objective) !== -1 ?
                             <><i className="fa fa-star starChecked"></i>{pedagogy.category}</>
@@ -185,7 +186,7 @@ class CooperatorModal extends React.Component {
                             <>{pedagogy.category}</>
                         }
                       </Col>
-                      <Col sm={12} style={({lineHeight: '20px', marginLeft:'30px', marginBottom: '20px'})} className={colorPillar(pedagogy.pillar)}>
+                      <Col sm={12} style={({lineHeight: '20px', marginLeft:'30px', marginBottom: '20px'})}>
                         {pedagogy.subCategory}
                       </Col>
                       <Col sm={2}><b>Objectif</b></Col>

@@ -8,7 +8,7 @@ import EventWrapper from '../common/EventWrapper'
 import Event from '../common/Event'
 import TimeSlotWrapper from '../common/TimeSlotWrapper'
 import PiloteModal from './PiloteModal'
-import {authFetch} from '../common/utils'
+import {authFetch, alert} from '../common/utils'
 
 require('globalize/lib/cultures/globalize.culture.fr')
 const globalizeLocalizer = localizer(globalize)
@@ -61,16 +61,10 @@ class PiloteCalendar extends React.Component {
   }
 
   onSelectEvent(event) {
-    const tooLate = moment(event.start).subtract(1, 'days');
+    const tooLate = moment(event.start);
     if(moment().isBefore(tooLate)){
       if(['Fermeture', 'Autonomie', 'Individuelle'].indexOf(event.status) === -1) {
-        if(this.props.whoami.pillar === event.status && this.props.whoami.level === event.level) {
-          this.setState({ show: true, currentEventId: event._id});
-        } else if(['Les soins pour soi', 'Booster sa candidature', 'La relation', 'L\'insertion sociale', 'Projet professionnel'].indexOf(event.status) === -1) {
-          this.setState({ show: true, currentEventId: event._id});
-        } else {
-          alert('Ceci n\'est pas une activité de ton groupe');
-        }
+        this.setState({ show: true, currentEventId: event._id});
       } else if(event.status === 'Individuelle') {
         if(event.isRegistered){
           alert('Inscription à cette activité validée')
@@ -78,6 +72,8 @@ class PiloteCalendar extends React.Component {
           alert('Merci de contacter ton copilote pour l\'inscription à cette activité')
         }
       }
+    } else {
+      alert('Cette activité est passée')
     }
   }
 

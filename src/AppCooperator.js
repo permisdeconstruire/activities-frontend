@@ -10,6 +10,7 @@ import './styles.css'
 import './prism.css'
 import CooperatorCalendar from './cooperator/CooperatorCalendar'
 import CooperatorHeader from './cooperator/CooperatorHeader'
+import AdminEvent from './admin/AdminEvent'
 import {authFetch, logout} from './common/utils'
 
 class App extends React.Component {
@@ -37,10 +38,16 @@ class App extends React.Component {
 
   render() {
     if(this.state.whoami !== null) {
-      let element = <CooperatorCalendar whoami={this.state.whoami}/>
+      let element;
+      if(this.state.route === '#cooperator-event') {
+        element = <AdminEvent type="cooperator" />
+      } else {
+        element = <CooperatorCalendar whoami={this.state.whoami}/>
+      }
       let header = <CooperatorHeader whoami={this.state.whoami}/>
       return (
         <div className="app">
+          {header}
           <div className="jumbotron">
             <img src="/logo.png" />
             <div className="container" style={({display: 'inline-grid', textAlign: 'center'})}>

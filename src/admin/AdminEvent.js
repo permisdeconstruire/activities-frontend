@@ -12,12 +12,13 @@ import {
   ControlLabel,
   FormControl,
 } from 'react-bootstrap';
-import {authFetch} from '../common/utils'
+import {authFetch, alert} from '../common/utils'
 import EventCourrier from './Events/EventCourrier'
 import EventEvaluation from './Events/EventEvaluation'
 import EventDivers from './Events/EventDivers'
 import EventRdv from './Events/EventRdv'
 import EventAppel from './Events/EventAppel'
+import EventParcours from './Events/EventParcours'
 import DatePicker from 'react-datepicker'
 import { registerLocale }  from 'react-datepicker'
 import fr from 'date-fns/locale/fr';
@@ -25,7 +26,7 @@ registerLocale('fr', fr);
 
 const dateFormat = 'dd/MM/YYYY HH:mm'
 
-const types = ['evaluation', 'divers', 'rdv', 'appel', 'courrier']
+let types = ['evaluation', 'divers', 'rdv', 'appel', 'courrier']
 
 class AdminEvent extends React.Component {
 
@@ -50,7 +51,10 @@ class AdminEvent extends React.Component {
   }
 
   componentDidMount() {
-    authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/pilotes`)
+    if(this.props.type === 'admin') {
+      types = ['parcours', 'evaluation', 'divers', 'rdv', 'appel', 'courrier']
+    }
+    authFetch(`${process.env.REACT_APP_BACKEND}/v0/${typeof(this.props.type) !== 'undefined' ? this.props.type : 'cooperator'}/pilotes?filter=NOT%20ph_statut%3A%28%22Termin%C3%A9%20Jamais%20vu%22%2C%22Termin%C3%A9%20Accueilli%22%2C%22Pas%20d%27effet%20imm%C3%A9diat%22%2C%22Projet%20de%20vie%20valid%C3%A9%22%2C%20%22Projet%20de%20vie%20travaill%C3%A9%22%29`)
       .then(res => {
         this.setState({piloteList: res});
       })
@@ -61,9 +65,9 @@ class AdminEvent extends React.Component {
     if(field === 'pilote') {
       const selectedPilote = this.state.piloteList.find(pilote => pilote._id === event.target.value);
       if(typeof(selectedPilote) === 'undefined') {
-        newState.pilote = {_id: 'none', pseudo: 'none', level: 0, pillar: 'none'};
+        newState.pilote = {_id: 'none', pseudo: 'none'};
       } else {
-        newState.pilote = {_id: selectedPilote._id, pseudo: selectedPilote.pseudo, pillar: (typeof(selectedPilote.pillar) !== 'undefined' && selectedPilote.pillar !== 'Coup de pouce') ? selectedPilote.pillar : 'none', level: (typeof(selectedPilote.level) !== 'undefined' ? parseInt(selectedPilote.level, 10) : 0)};
+        newState.pilote = {_id: selectedPilote._id, pseudo: selectedPilote.pseudo};
       }
 
     } else {
@@ -80,6 +84,8 @@ class AdminEvent extends React.Component {
         newState.data = {status: 'present', justificatif: 'oui', type: 'individuel'}
       } else if(event.target.value === 'appel') {
         newState.data = {direction: 'out', who: '', answered: 'oui'}
+      } else if(event.target.value === 'parcours') {
+        newState.data = {name: '', level: 0, what: 'start'}
       }
     }
     this.setState(newState);
@@ -98,10 +104,10 @@ class AdminEvent extends React.Component {
       type: this.state.type,
       comment: this.state.comment,
       pilote: this.state.pilote,
-      data: this.state.type === 'evaluation' ? {...this.state.data, pillar: this.state.pilote.pillar} : this.state.data,
+      data: this.state.data,
       date: this.state.date.toISOString(),
     }
-    authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/events`, {
+    authFetch(`${process.env.REACT_APP_BACKEND}/v0/${typeof(this.props.type) !== 'undefined' ? this.props.type : 'cooperator'}/events`, {
       method: 'POST',
       body: JSON.stringify(data),
       headers:{
@@ -126,7 +132,7 @@ class AdminEvent extends React.Component {
       return <EventCourrier data={this.state.data} onChange={this.handleChangeData} />
     }
     if(type === 'evaluation'){
-      return <EventEvaluation data={this.state.data} onChange={this.handleChangeData} level={this.state.pilote.level}/>
+      return <EventEvaluation data={this.state.data} onChange={this.handleChangeData}/>
     }
     if(type === 'divers'){
       return <EventDivers data={this.state.data} onChange={this.handleChangeData} />
@@ -136,6 +142,9 @@ class AdminEvent extends React.Component {
     }
     if(type === 'appel'){
       return <EventAppel data={this.state.data} onChange={this.handleChangeData} />
+    }
+    if(type === 'parcours') {
+      return <EventParcours data={this.state.data} onChange={this.handleChangeData} />
     }
   }
 

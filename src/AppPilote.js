@@ -37,6 +37,7 @@ class App extends React.Component {
 
   render() {
     if(this.state.whoami !== null) {
+      const jwt = window.localStorage.getItem('jwtPDC');
       let element = <PiloteCalendar whoami={this.state.whoami}/>
       let header = <PiloteHeader whoami={this.state.whoami}/>
       return (
@@ -45,7 +46,7 @@ class App extends React.Component {
             <img src="/logo.png" />
             <div className="container" style={({display: 'inline-grid', textAlign: 'center'})}>
               <Row>
-                Bonjour {this.state.whoami.pseudo}, bienvenue chez Permis de Construire. <a href="/" onClick={logout}>Se déconnecter</a> <a href={`${process.env.REACT_APP_BACKEND}/v0/activities.pdf`} target="_blank"> Télécharger l'agenda </a>
+                Bonjour {this.state.whoami.pseudo}, bienvenue chez Permis de Construire. <a href="/" onClick={logout}>Se déconnecter</a> <a href={`${process.env.REACT_APP_BACKEND}/v0/activities.pdf?token=${jwt}`} target="_blank"> Télécharger mon agenda </a>
               </Row>
             </div>
           </div>

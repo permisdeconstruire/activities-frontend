@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import React, { Component, createRef } from 'react';
 import ReactDOM from 'react-dom';
-import {authFetch} from './utils'
+import {authFetch, alert} from './utils'
 import {
   Row,
   Modal,
@@ -35,7 +35,8 @@ class FormViewer extends React.Component {
       form: false,
       title: '',
       list: [],
-      selected: 'none'
+      selected: 'none',
+      special: '',
     };
   }
 
@@ -50,7 +51,19 @@ class FormViewer extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.select = this.select.bind(this);
     this.delete = this.delete.bind(this);
+    this.handleChangeSpecial = this.handleChangeSpecial.bind(this);
     this.state = this.defaultState();
+    this.state.special = this.props.special;
+  }
+
+  handleChangeSpecial(event) {
+    if(this.state.special === '') {
+      this.setState({special: this.props.special})
+    } else {
+      this.setState({special: ''})
+    }
+    this.update();
+
   }
 
   select(event) {
@@ -62,6 +75,7 @@ class FormViewer extends React.Component {
         if(typeof(datum) !== 'undefined' && typeof(datum[newUserDatum.name]) !== 'undefined') {
           if(newUserDatum.type === 'checkbox-group') {
             newUserDatum.userData = datum[newUserDatum.name];
+            delete newUserDatum.required;
           } else if (newUserDatum.type === 'file') {
 
           } else {
@@ -76,6 +90,7 @@ class FormViewer extends React.Component {
         }
       }
     })
+
     const form = $(this.fv.current).formRender({
       formData: newUserData
     });
@@ -217,13 +232,15 @@ class FormViewer extends React.Component {
       .then(res => {
         if(res === 'Error') {
           alert('Quelque chose s\'est mal passé !')
+        } else if(res === 'PiloteAlreadyExists') {
+          alert('Attention, un pilote existe déjà avec ce prénom/nom/date de naissance');
         } else {
           alert('Élément sauvegardé !')
         }
         if(id === 'none') {
           id = res;
         }
-        return authFetch(`${process.env.REACT_APP_BACKEND}/v0${this.props.api}${this.props.special}`);
+        return authFetch(`${process.env.REACT_APP_BACKEND}/v0${this.props.api}${this.state.special}`);
       })
       .then(res => {
         this.setState({list: res, selected: id});
@@ -247,12 +264,12 @@ class FormViewer extends React.Component {
       form = $(this.fv.current).formRender({
         formData: res.formData
       });
-      console.log(this.props);
-      return authFetch(`${process.env.REACT_APP_BACKEND}/v0${this.props.api}${this.props.special}`);
+
+      return authFetch(`${process.env.REACT_APP_BACKEND}/v0${this.props.api}${this.state.special}`);
     })
     .then(res => {
       const selected = window.localStorage.getItem(`${this.props.formType}_id`) || 'none';
-      this.setState({form, title, list: res, selected})
+      this.setState({form, title, list: res, selected, special: this.state.special})
       this.select({target: {value: selected}});
     })
   }
@@ -265,6 +282,9 @@ class FormViewer extends React.Component {
     return (
       <Row>
         <Col sm={2}>
+          { this.props.special !== '' &&
+            (<><span>Afficher tout</span> : <input type="checkbox" className="btn-sm" checked={this.state.special === '' ? 'checked' : ''} onChange={this.handleChangeSpecial}/></>)
+          }
           <FormControl onChange={this.select} value={this.state.selected} componentClass="select">
             <option key="none" value="none">----</option>
             {this.state.list.sort((a,b) => a[this.props.keyname]<b[this.props.keyname] ? -1 : 1).map((datum) => <option key={datum._id} value={datum._id}>{datum[this.props.keyname]}</option>)}

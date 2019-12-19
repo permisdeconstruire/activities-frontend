@@ -16,9 +16,9 @@ import {authFetch, listPedagogy} from '../../common/utils'
 import Pedagogy from '../../common/Pedagogy'
 
 const evaluations = [
-  {name: 'Non aquis', value: 0},
-  {name: 'En cours d\'aquisition', value: 1},
-  {name: 'Aquis', value: 2},
+  {name: 'Non réalisé', value: 1},
+  {name: 'Partiellement réalisé', value: 2},
+  {name: 'Réalisé', value: 3},
 ]
 
 class EventEvaluation extends React.Component {
@@ -42,7 +42,7 @@ class EventEvaluation extends React.Component {
   render() {
     return (
       <>
-        <Pedagogy pedagogy={this.props.data} onChange={this.props.onChange} fixedLevel={this.props.level} />
+        <Pedagogy pedagogy={this.props.data} onChange={this.props.onChange} />
         <FormGroup controlId="formHorizontalPedagogyNote">
           <Col componentClass={ControlLabel} sm={4}>
             Évaluation

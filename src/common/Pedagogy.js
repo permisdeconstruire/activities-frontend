@@ -14,27 +14,6 @@ import {
 } from 'react-bootstrap';
 import {authFetch, listPedagogy} from './utils'
 
-const pillars = [
-  'Bien vivre',
-  'Bien-être psychologique',
-  'Bien-être corporel',
-  'Bien faire',
-]
-
-const levels = {
-  1: '1) Découvrir',
-  2: '2) Comprendre',
-  3: '3) Choisir',
-  4: '4) Réaliser',
-}
-
-const evaluations = [
-  {name: 'Non aquis', value: 0},
-  {name: 'En cours d\'aquisition', value: 1},
-  {name: 'Aquis', value: 2},
-]
-
-
 class Pedagogy extends React.Component {
 
   defaultState() {
@@ -69,16 +48,6 @@ class Pedagogy extends React.Component {
       .then(res => {
         this.setState({allPedagogy: res});
       })
-  }
-
-  genPillarOptions(objective) {
-    if(typeof(objective) !== 'undefined' && typeof(objective.pillars) !== 'undefined'){
-      return (
-      <>
-        {objective.pillars.map(pillar => <option key={pillar} value={pillar}>{pillar}</option>)}
-      </>
-      )
-    }
   }
 
   render() {

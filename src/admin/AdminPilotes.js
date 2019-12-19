@@ -11,8 +11,10 @@ import {
   ControlLabel,
   FormControl,
 } from 'react-bootstrap';
+import FilePilote from '../common/FilePilote'
 import {authFetch} from '../common/utils'
 
+const regexPilote = new RegExp('__PILOTE_ID_HERE__', 'gi');
 
 class AdminPilotes extends React.Component {
 
@@ -32,11 +34,17 @@ class AdminPilotes extends React.Component {
 
   select(event) {
     const pilote = this.state.pilotes.find(p => p._id === event.target.value);
+    console.log(pilote);
     if(typeof(pilote) === 'undefined') {
       this.setState({pilote: {_id: 'none', pseudo:''}});
     } else {
       this.setState({pilote: {_id: pilote._id, pseudo: pilote.pseudo}});
     }
+    authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/pilotes/id/${pilote._id}`)
+      .then(res => {
+        console.log(res);
+        this.setState({data: res})
+      })
   }
 
   update() {
@@ -56,8 +64,8 @@ class AdminPilotes extends React.Component {
   }
 
   render() {
-    const regexPilote = new RegExp('__PILOTE_ID_HERE__', 'gi');
     return (
+      <>
       <Row>
         <Col sm={2}>
           <FormControl onChange={this.select} value={this.state.pilote._id} componentClass="select">
@@ -69,6 +77,12 @@ class AdminPilotes extends React.Component {
           <a href={this.state.options.kibana.replace(regexPilote, this.state.pilote._id)} target="_blank">{this.state.pilote.pseudo}</a>
         </Col>
       </Row>
+      {typeof(this.state.data) !== 'undefined' &&
+        <Row>
+          <FilePilote pilote={this.state.pilote} data={this.state.data} />
+        </Row>
+      }
+      </>
     )
   }
 }

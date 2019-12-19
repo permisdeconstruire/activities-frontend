@@ -15,7 +15,7 @@ import {
 import DatePicker from 'react-datepicker'
 import { registerLocale }  from 'react-datepicker'
 import fr from 'date-fns/locale/fr';
-import {authFetch, colorPillar} from '../common/utils'
+import {authFetch} from '../common/utils'
 registerLocale('fr', fr);
 
 const dateFormat = 'dd/MM/YYYY HH:mm'
@@ -153,7 +153,7 @@ class PiloteModal extends React.Component {
                 this.state.pedagogy.sort((a,b) => a.category+a.subCategory+a.objective<b.category+b.subCategory+b.objective ? -1 : 1).map((pedagogy, index) => (
                   <div key={`peda_${index}`}>
                   <Row key={`peda_${index}`}>
-                    <Col sm={10} style={({fontWeight:'bold', lineHeight: '34px'})} className={colorPillar(pedagogy.pillar)}>
+                    <Col sm={10} style={({fontWeight:'bold', lineHeight: '34px'})}>
                       {pedagogy.category}
                     </Col>
                     <Col sm={2}>

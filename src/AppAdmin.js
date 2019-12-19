@@ -50,7 +50,7 @@ class App extends React.Component {
       } else if(this.state.route.startsWith('#form')) {
         const formTitle = this.state.route.replace('#form_', '');
         console.log(formTitle)
-        element = <FormViewer formType="pilote" formTitle={formTitle} api="/admin/pilotes" keyname="pseudo" special="?filter=ph_statut:(%221-Orienté%22,%222-Contacté%22,%223-Accueilli%22,%224-Suivi%22)"/>
+        element = <FormViewer formType="pilote" formTitle={formTitle} api="/admin/pilotes" keyname="pseudo" special="?filter=NOT%20ph_statut%3A%28%22Termin%C3%A9%20Jamais%20vu%22%2C%22Termin%C3%A9%20Accueilli%22%2C%22Pas%20d%27effet%20imm%C3%A9diat%22%2C%22Projet%20de%20vie%20valid%C3%A9%22%2C%20%22Projet%20de%20vie%20travaill%C3%A9%22%29"/>
         header = <AdminHeader whoami={this.state.whoami} />;
       } else if(this.state.route === '#pilotes') {
         element = <AdminPilotes />
@@ -59,7 +59,7 @@ class App extends React.Component {
       } else if(this.state.route === '#pedagogy') {
         element = <AdminPedagogy />
       } else if(this.state.route === '#event') {
-        element = <AdminEvent />
+        element = <AdminEvent type="admin" />
       } else {
         element = <AdminCalendar />
       }

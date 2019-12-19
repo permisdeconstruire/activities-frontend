@@ -11,7 +11,7 @@ import {
   ControlLabel,
   FormControl,
 } from 'react-bootstrap';
-import {authFetch} from '../common/utils'
+import {authFetch, alert} from '../common/utils'
 window.jQuery = $;
 window.$ = $;
 require('jquery-ui-sortable');

@@ -1,26 +1,22 @@
 function colorActivity(status) {
   if (status === 'Autonomie') {
-    return 'orangeActivity'
+    return 'autonomieActivity'
   } else if (status === 'Socio-éducatif') {
-    return 'greenActivity'
-  } else if (status === 'Formative') {
-    return 'blueActivity'
-  } else if (status === 'Individuelle') {
-    return 'purpleActivity'
+    return 'socioeducatifActivity'
+  } else if (status === 'Projet professionnel') {
+    return 'projetprofessionelActivity'
+  } else if (status === 'La Relation') {
+    return 'larelationActivity'
   } else if (status === 'Fermeture') {
-    return 'grayActivity'
-  }
-}
-
-function colorPillar(pillar) {
-  if(pillar === 'Bien vivre') {
-    return 'orangePillar'
-  } else if (pillar === 'Bien-être psychologique') {
-    return 'purplePillar'
-  } else if (pillar === 'Bien-être corporel') {
-    return 'bluePillar'
-  } else if (pillar === 'Bien faire') {
-    return 'greenPillar'
+    return 'fermetureActivity'
+  } else if (status === 'Les Soins pour Soi') {
+    return 'lessoinspoursoiActivity'
+  } else if (status === 'Booster sa candidature') {
+    return 'boostersacandidatureActivity';
+  } else if (status === 'Individuelle') {
+    return 'individuelleActivity';
+  } else if (status === 'Insertion sociale') {
+    return 'insertionsocialeActivity';
   }
 }
 
@@ -42,6 +38,7 @@ function authFetch(url, options = {headers: {}}) {
   return fetch(url, newOptions)
     .then(res => res.json(res))
     .catch(e => {
+      console.log('fuuu');
       document.location.href = `${process.env.REACT_APP_BACKEND}/v0/login`;
     })
 }
@@ -60,11 +57,16 @@ function logout() {
   window.localStorage.removeItem('jwtPDC');
 }
 
+function alert(text) {
+  document.getElementById('alertContent').textContent = text;
+  document.getElementById('alert').style.display = 'block';
+}
+
 module.exports = {
-  colorPillar,
   colorActivity,
   authFetch,
   listPedagogy,
   listCooperators,
   logout,
+  alert,
 }

@@ -28,6 +28,16 @@
   <link rel="stylesheet" href="%PUBLIC_URL%/font-awesome.min.css">
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div class="modal" id="alert">
+      <div class="modal-dialog modal-sm" style="margin-top: 200px;">
+        <div class="modal-content">
+          <div class="modal-body">
+            <p id="alertContent"></p>
+            <p style="text-align: right; margin-bottom: 0px;"><button type="button" class="btn btn-default" onclick="document.getElementById('alert').style.display='none';">Fermer</button></p>
+          </div>
+        </div>
+      </div>
+    </div>
     <div id="root"></div>
     <!--
       This HTML file is a template.

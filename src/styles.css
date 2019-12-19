@@ -29,6 +29,7 @@ a:active {
 
 .jumbotron img {
   margin-left: 20px;
+  vertical-align: bottom;
 }
 
 .jumbotron a {
@@ -269,31 +270,49 @@ h4 a:focus .anchor-icon {
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
 }
 
-
-
-.greenActivity .rbc-event {
-  background-color: #41a62a;
-  border: 1px solid #41a62a;
+.autonomieActivity .rbc-event{
+  background-color: #e3d075;
+  border: 1px solid #e3d075;
 }
 
-.purpleActivity .rbc-event {
+.socioeducatifActivity .rbc-event{
+  background-color: #ff671d;
+  border: 1px solid #ff671d;
+}
+
+.projetprofessionelActivity .rbc-event{
+  background-color: #005aa4;
+  border: 1px solid #005aa4;
+}
+
+.larelationActivity .rbc-event {
   background-color: #951b81;
   border: 1px solid #951b81;
 }
 
-.orangeActivity .rbc-event {
-  background-color: #eb691c;
-  border: 1px solid #eb691c;
-}
-
-.blueActivity .rbc-event {
-  background-color: #008bd0;
-  border: 1px solid #008bd0;
-}
-
-.grayActivity .rbc-event {
+.fermetureActivity .rbc-event {
   background-color: #858585;
   border: 1px solid #858585;
+}
+
+.lessoinspoursoiActivity .rbc-event {
+  background-color: #fbb914;
+  border: 1px solid #fbb914;
+}
+
+.boostersacandidatureActivity .rbc-event {
+  background-color: #008cff;
+  border: 1px solid #008cff;
+}
+
+.individuelleActivity .rbc-event {
+  background-color: #df55c7;
+  border: 1px solid #df55c7;
+}
+
+.insertionsocialeActivity .rbc-event {
+  background-color: #3aaa35;
+  border: 1px solid #3aaa35;
 }
 
 .rbc-event-content .event-place a {
@@ -366,22 +385,6 @@ h4 a:focus .anchor-icon {
   margin-right: 5px;
 }
 
-.greenPillar {
-  color: #41a62a;
-}
-
-.purplePillar {
-  color: #93117e;
-}
-
-.orangePillar {
-  color: #eb691c;
-}
-
-.bluePillar {
-  color: #008bd0;
-}
-
 .rbc-time-slot .rbc-event {
   height: 5.55556%;
   text-align: center;
@@ -419,4 +422,12 @@ h4 a:focus .anchor-icon {
 
 .navbar {
   margin-bottom: 0px;
+}
+
+.pillarTitle {
+  font-size: 0.9em;
+}
+
+.pillarDescription {
+  font-size: 0.9em;
 }
