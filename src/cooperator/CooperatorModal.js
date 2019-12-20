@@ -15,7 +15,7 @@ import {
 import DatePicker from 'react-datepicker'
 import { registerLocale }  from 'react-datepicker'
 import fr from 'date-fns/locale/fr';
-import {authFetch} from '../common/utils'
+import {authFetch, alert} from '../common/utils'
 registerLocale('fr', fr);
 
 const dateFormat = 'dd/MM/YYYY HH:mm'
@@ -45,8 +45,13 @@ class CooperatorModal extends React.Component {
     this.handleChangeComment = this.handleChangeComment.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleSubmitSpecial = this.handleSubmitSpecial.bind(this);
+    this.getEvent = this.getEvent.bind(this);
 
     this.state = this.defaultState();
+  }
+
+  getEvent(piloteId) {
+    return authFetch(`${process.env.REACT_APP_BACKEND}/v0/cooperator/activities/id/${this.props.currentEventId}/pilote/${piloteId}`)
   }
 
   handleSubmitSpecial(activityAction){
@@ -97,6 +102,7 @@ class CooperatorModal extends React.Component {
 
     Promise.all(eventPromises)
       .then(res => {
+        alert('Évaluation envoyée.');
         const newState = this.defaultState();
         const event = this.props.events.find(event => event.id === this.props.currentEventId)
         newState.pedagogy = JSON.parse(JSON.stringify(event.pedagogy));
@@ -126,7 +132,12 @@ class CooperatorModal extends React.Component {
     if(typeof(selectedPilote) === 'undefined') {
       this.setState({pilote: {_id: 'none', pseudo: '', pedagogy: []}})
     } else {
-      this.setState({pilote: selectedPilote})
+      this.getEvent(selectedPilote._id).then((events) => {
+        const comments = events.map(e => e.comment)
+        const evaluations = events.map(e => e.evaluation)
+
+        this.setState({pilote: selectedPilote, comments, evaluations});
+      })
     }
 
   }

@@ -96,7 +96,7 @@ class App extends React.Component {
             <img src="/logo.png" />
             <div className="container" style={({display: 'inline-grid', textAlign: 'center'})}>
               <Row>
-                Bonjour {name}, bienvenue chez Permis de Construire. <a href="/" onClick={logout}>Se déconnecter</a> <a href={`${process.env.REACT_APP_BACKEND}/v0/activities.pdf?token=${jwt}`} target="_blank"> Télécharger l'agenda </a>
+                Bonjour {name}, bienvenue chez Permis de Construire. <a href="#" onClick={logout}>Se déconnecter</a> <a href={`${process.env.REACT_APP_BACKEND}/v0/activities.pdf?token=${jwt}`} target="_blank"> Télécharger l'agenda </a>
               </Row>
             </div>
           </div>

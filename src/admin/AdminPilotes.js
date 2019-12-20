@@ -34,7 +34,6 @@ class AdminPilotes extends React.Component {
 
   select(event) {
     const pilote = this.state.pilotes.find(p => p._id === event.target.value);
-    console.log(pilote);
     if(typeof(pilote) === 'undefined') {
       this.setState({pilote: {_id: 'none', pseudo:''}});
     } else {
@@ -42,7 +41,6 @@ class AdminPilotes extends React.Component {
     }
     authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/pilotes/id/${pilote._id}`)
       .then(res => {
-        console.log(res);
         this.setState({data: res})
       })
   }

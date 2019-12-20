@@ -27,7 +27,11 @@ class EventRdv extends React.Component {
 
   handleChange(field, event){
     const newProps = this.props.data;
-    newProps[field] = event.target.value
+    if(field === 'level') {
+      newProps[field] = parseInt(event.target.value, 10)
+    } else {
+      newProps[field] = event.target.value;
+    }
     this.props.onChange(newProps)
   }
 

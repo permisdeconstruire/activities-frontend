@@ -23,7 +23,6 @@ function genListGroupItem(objective, evaluations) {
   }
   const score = evaluated.reduce((acc, e) => acc + e.evaluation, 0)/evaluated.length;
   const scoreString = evaluated.reduce((acc, e) => `${acc}, ${evaluationName[e.evaluation]}`, '');
-  console.log(score)
   if(score === 0) {
     return (<ListGroupItem key={objective._id}>{objective.objective} ({evaluated.length} évaluation{evaluated.length>1?'s':''} : {scoreString.substring(2)})</ListGroupItem>)
   }
@@ -47,7 +46,6 @@ class FilePilote extends React.Component {
   }
 
   render() {
-    console.log(this.props.data);
     return (
       <Col sm={8} style={({margin: 'auto', 'marginTop': '10px'})}>
           <ListGroup>

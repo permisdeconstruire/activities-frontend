@@ -380,7 +380,6 @@ class AdminModal extends React.Component {
 
   render() {
     let form;
-    console.log(this.state);
 
     if(this.state.step === 0) {
       form = (

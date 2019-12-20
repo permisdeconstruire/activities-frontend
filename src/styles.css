@@ -345,7 +345,7 @@ h4 a:focus .anchor-icon {
 }
 
 .is-registered-true .rbc-event {
-  border: 2px solid black;
+  border: 5px solid red;
 }
 
 .uploadedFile {
@@ -430,4 +430,9 @@ h4 a:focus .anchor-icon {
 
 .pillarDescription {
   font-size: 0.9em;
+}
+
+
+#alert {
+  z-index: 100000;
 }
