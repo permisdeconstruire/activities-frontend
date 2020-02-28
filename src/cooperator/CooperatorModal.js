@@ -10,6 +10,8 @@ import {
   Col,
   ControlLabel,
   FormControl,
+  Nav,
+  NavItem,
 } from 'react-bootstrap';
 
 import DatePicker from 'react-datepicker'
@@ -35,6 +37,8 @@ class CooperatorModal extends React.Component {
       pilote: {_id: 'none', pseudo: '', pedagogy:[]},
       comments: [],
       evaluations: [],
+      globalPiloteComments: '',
+      globalActivityComments: '',
     }
   }
 
@@ -44,7 +48,12 @@ class CooperatorModal extends React.Component {
     this.handleChangeEvaluation = this.handleChangeEvaluation.bind(this);
     this.handleChangeComment = this.handleChangeComment.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleSubmitDivers = this.handleSubmitDivers.bind(this);
+    this.handleSubmitComments = this.handleSubmitComments.bind(this);
     this.handleSubmitSpecial = this.handleSubmitSpecial.bind(this);
+    this.handleSelect = this.handleSelect.bind(this);
+    this.handleChangeGlobalPiloteComments = this.handleChangeGlobalPiloteComments.bind(this);
+    this.handleChangeGlobalActivityComments = this.handleChangeGlobalActivityComments.bind(this);
     this.getEvent = this.getEvent.bind(this);
 
     this.state = this.defaultState();
@@ -76,6 +85,47 @@ class CooperatorModal extends React.Component {
         })
         this.setState(newState);
       })
+  }
+
+  handleChangeGlobalPiloteComments({target}) {
+    this.setState({globalPiloteComments: target.value});
+  }
+
+  handleChangeGlobalActivityComments({target}) {
+    this.setState({globalActivityComments: target.value});
+  }
+
+  handleSubmitDivers(e) {
+    const data = {
+      pilote: {_id: this.state.pilote._id, pseudo: this.state.pilote.pseudo},
+      comment: this.state.globalPiloteComments,
+      data: {
+        objective: 'Commentaire global',
+        evaluation: -1,
+      }
+    }
+
+    authFetch(`${process.env.REACT_APP_BACKEND}/v0/cooperator/activities/id/${this.props.currentEventId}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+      headers:{
+        'Content-Type': 'application/json'
+      }
+    }).then(res => {
+      alert('Commentaires envoyés.');
+    })
+  }
+
+  handleSubmitComments(e) {
+    authFetch(`${process.env.REACT_APP_BACKEND}/v0/cooperator/activities/id/${this.props.currentEventId}/comment`, {
+      method: 'PUT',
+      body: JSON.stringify({comments: this.state.globalActivityComments}),
+      headers:{
+        'Content-Type': 'application/json'
+      }
+    }).then(res => {
+      alert('Commentaires envoyés.');
+    })
   }
 
   handleSubmit(activityAction) {
@@ -133,13 +183,17 @@ class CooperatorModal extends React.Component {
       this.setState({pilote: {_id: 'none', pseudo: '', pedagogy: []}})
     } else {
       this.getEvent(selectedPilote._id).then((events) => {
-        const comments = events.map(e => e.comment)
-        const evaluations = events.map(e => e.evaluation)
+        const comments = events.evaluations.map(e => e.comment)
+        const evaluations = events.evaluations.map(e => e.evaluation)
 
-        this.setState({pilote: selectedPilote, comments, evaluations});
+        this.setState({pilote: selectedPilote, comments, evaluations, globalPiloteComments: events.globalPiloteComments});
       })
     }
 
+  }
+
+  handleSelect(e) {
+    this.setState({step: e})
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -147,6 +201,9 @@ class CooperatorModal extends React.Component {
       const event = this.props.events.find(event => event.id === this.props.currentEventId)
       if(typeof(event) !== 'undefined') {
         const newState = this.defaultState();
+        if(typeof(event.cooperatorComments) !== 'undefined') {
+          newState.globalActivityComments = event.cooperatorComments;
+        }
         newState.pedagogy = JSON.parse(JSON.stringify(event.pedagogy));
         newState.pedagogy.forEach(a => {
           newState.comments.push('')
@@ -162,16 +219,10 @@ class CooperatorModal extends React.Component {
     if(typeof(event) === 'undefined') {
       return (<></>);
     }
-    return (
-      <Modal show={this.props.show} onHide={this.props.onClose}>
-        <Modal.Header closeButton >
-          <Modal.Title><b>{event.theme}</b> - {event.title}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Panel>
+    let panel;
+    if(this.state.step === 0) {
+      panel = (<Panel>
             <Panel.Heading>
-              Évaluation du pilote
-
                 { (typeof(event.participants) !== 'undefined' && event.participants.length > 0)
                   ?
                     <FormControl onChange={this.handleChangePilote} value={this.state.pilote._id} componentClass="select">
@@ -179,7 +230,7 @@ class CooperatorModal extends React.Component {
                       {event.participants.sort((a,b) => a.pseudo<b.pseudo ? -1 : 1).map((p) => <option key={p._id} value={p._id}>{p.pseudo}</option>)}
                     </FormControl>
                   :
-                    <> - Aucun inscrit</>
+                    <>Aucun inscrit</>
                 }
 
             </Panel.Heading>
@@ -206,13 +257,13 @@ class CooperatorModal extends React.Component {
                       </Col>
                       <Col sm={2}><b>Critère</b></Col>
                       <Col sm={10} style={({textAlign:'justify', marginBottom: '20px'})}>
-                        {`${pedagogy.indicator}`}
+                        {`${pedagogy.indicator !== '' ? pedagogy.indicator : 'Non défini'}`}
                       </Col>
                       <Col sm={8}>
-                        <FormControl onChange={this.handleChangeComment.bind(this, index)} value={this.state.comments[index]} type="text" placeholder="Commentaires" />
+                        <FormControl onChange={this.handleChangeComment.bind(this, index)} value={this.state.comments[index]} type="text" readOnly={!event.isCooperator} placeholder="Commentaires" />
                       </Col>
                       <Col sm={4}>
-                        <FormControl onChange={this.handleChangeEvaluation.bind(this, index)} value={this.state.evaluations[index]} componentClass="select">
+                        <FormControl readOnly={!event.isCooperator} onChange={this.handleChangeEvaluation.bind(this, index)} value={this.state.evaluations[index]} componentClass="select">
                           <option key="none" value="-1">-- Evaluation --</option>
                           {evaluations.map(evaluation => <option key={evaluation.name} value={evaluation.value}>{evaluation.name}</option>)}
                         </FormControl>
@@ -224,14 +275,71 @@ class CooperatorModal extends React.Component {
                 }
               </Form>
             </Panel.Body>
-          </Panel>
+          </Panel>)
+    } else if(this.state.step === 1) {
+      panel = (<Panel>
+            <Panel.Heading>
+                { (typeof(event.participants) !== 'undefined' && event.participants.length > 0)
+                  ?
+                    <FormControl onChange={this.handleChangePilote} value={this.state.pilote._id} componentClass="select">
+                      <option key="none" value="none">------</option>
+                      {event.participants.sort((a,b) => a.pseudo<b.pseudo ? -1 : 1).map((p) => <option key={p._id} value={p._id}>{p.pseudo}</option>)}
+                    </FormControl>
+                  :
+                    <>Aucun inscrit</>
+                }
+
+            </Panel.Heading>
+            <Panel.Body>
+              <FormGroup controlId="formHorizontalAnnotation">
+                <FormControl readOnly={!event.isCooperator} style={({height:'200px'})} onChange={this.handleChangeGlobalPiloteComments} componentClass="textarea" value={this.state.globalPiloteComments}  type="text" placeholder="Détails supplémentaires sur le pilote" />
+              </FormGroup>
+            </Panel.Body>
+          </Panel>)
+    } else if(this.state.step === 2) {
+      panel = (<Panel>
+            <Panel.Body>
+              <FormGroup controlId="formHorizontalAnnotation">
+                <FormControl readOnly={!event.isCooperator} style={({height:'200px'})} onChange={this.handleChangeGlobalActivityComments} componentClass="textarea" value={this.state.globalActivityComments}  type="text" placeholder="Détails supplémentaires sur l'activité" />
+              </FormGroup>
+            </Panel.Body>
+          </Panel>)
+    }
+    return (
+      <Modal show={this.props.show} onHide={this.props.onClose}>
+        <Modal.Header closeButton >
+          <Modal.Title><b>{event.theme}</b> - {event.title}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Nav bsStyle="pills" activeKey={this.state.step} onSelect={this.handleSelect}>
+            <NavItem eventKey={0}>
+              Évaluation du pilote
+            </NavItem>
+            <NavItem eventKey={1}>
+              Commentaires sur le pilote
+            </NavItem>
+            <NavItem eventKey={2}>
+              Commentaires sur l'activité
+            </NavItem>
+          </Nav>
+          {panel}
         </Modal.Body>
         <Modal.Footer>
-        { this.state.pilote._id !== 'none' &&
+        { event.isCooperator && this.state.pilote._id !== 'none' && this.state.step === 0 &&
           <>
             <Button onClick={this.handleSubmitSpecial.bind(this, 'missed')} bsStyle="danger">{this.state.pilote.pseudo} était absent</Button>
             <Button onClick={this.handleSubmit.bind(this, 'late')} bsStyle="primary">Évaluer mais en retard</Button>
             <Button onClick={this.handleSubmit.bind(this, 'done')} bsStyle="success">Évaluer</Button>
+          </>
+        }
+        { event.isCooperator && this.state.pilote._id !== 'none' && this.state.step === 1 &&
+          <>
+            <Button onClick={this.handleSubmitDivers} bsStyle="success">Envoyer</Button>
+          </>
+        }
+        { event.isCooperator && this.state.step === 2 &&
+          <>
+            <Button onClick={this.handleSubmitComments} bsStyle="success">Envoyer</Button>
           </>
         }
         </Modal.Footer>

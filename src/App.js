@@ -1,1 +1,1 @@
-AppDev.js
+AppAdmin.js

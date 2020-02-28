@@ -30,6 +30,8 @@
     "build-admin": "ln -fs AppAdmin.js src/App.js && REACT_APP_BACKEND=https://api.pdc.bug.builders react-scripts build && tar cvzf build-admin.tar.gz build",
     "build-public": "ln -fs AppPublic.js src/App.js && REACT_APP_BACKEND=https://api.pdc.bug.builders react-scripts build && tar cvzf build-public.tar.gz build",
     "build-cooperator": "ln -fs AppCooperator.js src/App.js && REACT_APP_BACKEND=https://api.pdc.bug.builders react-scripts build && tar cvzf build-cooperator.tar.gz build",
+    "build-all": "yarn build && yarn build-admin && yarn build-public && yarn build-cooperator",
+    "scp-all": "scp build-pilote.tar.gz root@pdc.bug.builders:/var/www/pilote/ && scp build-admin.tar.gz root@pdc.bug.builders:/var/www/admin/ && scp build-cooperator.tar.gz root@pdc.bug.builders:/var/www/cooperator/ && scp build-public.tar.gz root@pdc.bug.builders:/var/www/public/",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

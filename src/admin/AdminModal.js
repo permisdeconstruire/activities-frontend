@@ -527,13 +527,14 @@ class AdminModal extends React.Component {
               <FormGroup controlId="formHorizontalParticipants">
                 {this.state.cooperators.map((cooperator, index) =>
                   <div key={index}>
-                  <Col style={({marginBottom:'10px'})} key={index} sm={index > 0 ? 5 : 6}>
+                  <Col style={({marginBottom:'10px'})} key={index} sm={index > 0 ? 4 : 5}>
                     <FormControl onChange={this.handleChangeCooperator.bind(this, index)} value={cooperator._id} componentClass="select">
                       <option key="none" value="none">------</option>
                       {this.allCooperators.sort((a,b) => a.titre<b.titre ? -1 : 1).map((c) => <option key={c._id} value={c._id}>{c.titre}</option>)}
                     </FormControl>
                   </Col>
-                  {index > 0 && (<Col sm={1}><Button bsStyle="danger" onClick={this.deleteCooperator.bind(this, index)}>-</Button></Col>)}
+                  <Col sm={1}><a target="_blank" href={`${process.env.REACT_APP_BACKEND}/v0/admin/cooperators/id/${cooperator._id}?token=${window.localStorage.getItem('jwtPDC')}`} className="btn btn-sm btn-primary" title="Impersonate">😒</a></Col>
+                  {index > 0 && (<Col sm={1}><Button bsSize="small" bsStyle="danger" onClick={this.deleteCooperator.bind(this, index)}>-</Button></Col>)}
                   </div>
                 )}
               </FormGroup>

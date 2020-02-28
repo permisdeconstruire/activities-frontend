@@ -13,8 +13,6 @@ import {authFetch, alert} from '../common/utils'
 require('globalize/lib/cultures/globalize.culture.fr')
 const globalizeLocalizer = localizer(globalize)
 
-const parcours = ['Projet professionnel', 'La Relation', 'Les Soins pour Soi', 'Booster sa candidature', 'Insertion sociale']
-
 function convertToBigCalendarEvents(events, whoami) {
   return events.map(event => {
     const newEvent = event;
@@ -31,22 +29,11 @@ function convertToBigCalendarEvents(events, whoami) {
       if(typeof(whoami) !== 'undefined' && typeof(event.participants) !== 'undefined' && event.participants.findIndex(participant => participant._id === whoami.roles.pilote) !== -1) {
         return event;
       }
+      if(['Fermeture', 'Autonomie'].includes(event.status)) {
+        return event;
+      }
     } else {
-      if(parcours.indexOf(event.status) === -1) {
         return event;
-      }
-
-      if(typeof(whoami) !== 'undefined' && event.status !== whoami.pillar) {
-        return event;
-      }
-
-      if(typeof(whoami) !== 'undefined' && event.status === whoami.pillar && event.level === whoami.level) {
-        return event;
-      }
-
-      if(typeof(whoami) === 'undefined') {
-        return event;
-      }
     }
 
   })

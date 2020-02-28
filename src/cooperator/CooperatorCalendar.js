@@ -61,7 +61,7 @@ class CooperatorCalendar extends React.Component {
   }
 
   onSelectEvent(event) {
-    if(event.status !== 'Fermeture' && event.status !== 'Autonomie' && event.isCooperator) {
+    if(event.status !== 'Fermeture' && event.status !== 'Autonomie') {
       this.setState({ show: true, currentEventId: event.id});
     }
   }

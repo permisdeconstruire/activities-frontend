@@ -75,6 +75,13 @@ class AdminPilotes extends React.Component {
           <a href={this.state.options.kibana.replace(regexPilote, this.state.pilote._id)} target="_blank">{this.state.pilote.pseudo}</a>
         </Col>
       </Row>
+      {this.state.pilote.pseudo &&
+        <Row>
+          <Col sm={8} style={({margin:'auto'})}>
+            <a href={`${process.env.REACT_APP_BACKEND}/v0/admin/pilotes/id/${this.state.pilote._id}/activities.pdf?token=${window.localStorage.getItem('jwtPDC')}`} target="_blank">Télécharger son agenda</a>
+          </Col>
+        </Row>
+      }
       {typeof(this.state.data) !== 'undefined' &&
         <Row>
           <FilePilote pilote={this.state.pilote} data={this.state.data} />

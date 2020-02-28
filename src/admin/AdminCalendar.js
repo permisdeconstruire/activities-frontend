@@ -5,6 +5,17 @@ import moment from 'moment'
 import localizer from 'react-big-calendar/lib/localizers/globalize'
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop'
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css'
+import {
+  Row,
+  Modal,
+  Panel,
+  Button,
+  Form,
+  FormGroup,
+  Col,
+  ControlLabel,
+  FormControl,
+} from 'react-bootstrap';
 import globalize from 'globalize'
 import EventWrapper from '../common/EventWrapper'
 import TimeSlotWrapper from '../common/TimeSlotWrapper'
@@ -16,11 +27,15 @@ const DragAndDropCalendar = withDragAndDrop(BigCalendar)
 require('globalize/lib/cultures/globalize.culture.fr')
 const globalizeLocalizer = localizer(globalize)
 
-function convertToBigCalendarEvents(events) {
+function convertToBigCalendarEvents(events, pilote = 'none') {
   return events.map(event => {
     const newEvent = event;
     newEvent.start = new Date(newEvent.start)
     newEvent.end = new Date(newEvent.end)
+    newEvent.isRegistered = false
+    if(pilote !== 'none' && typeof(event.participants) !== 'undefined') {
+      newEvent.isRegistered = event.participants.findIndex(participant => participant._id === pilote) !== -1;
+    }
     return newEvent;
   })
 }
@@ -33,6 +48,8 @@ class AdminCalendar extends React.Component {
       events: [],
       start: new Date(),
       end: new Date(),
+      selectedPilote: 'none',
+      pilotes: [],
     };
   }
 
@@ -43,6 +60,7 @@ class AdminCalendar extends React.Component {
     this.onSelectSlot = this.onSelectSlot.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.onSelectEvent = this.onSelectEvent.bind(this);
+    this.selectPilote = this.selectPilote.bind(this);
     this.refresh = this.refresh.bind(this);
 
     this.state = this.defaultState();
@@ -51,7 +69,11 @@ class AdminCalendar extends React.Component {
   refresh() {
     authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/activities`)
       .then(events => {
-        this.setState({events: convertToBigCalendarEvents(events)})
+        this.setState({events: convertToBigCalendarEvents(events, this.state.selectedPilote)})
+      })
+    authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/pilotes?filter=NOT%20ph_statut%3A%22Termin%C3%A9%22`)
+      .then(pilotes => {
+        this.setState({pilotes})
       })
   }
 
@@ -59,12 +81,49 @@ class AdminCalendar extends React.Component {
     this.refresh();
   }
 
+  selectPilote(e) {
+    this.setState({selectedPilote: e.target.value, events: convertToBigCalendarEvents(this.state.events, e.target.value)})
+  }
+
   onSelectSlot(slotInfo){
-    this.setState({ show: true, start: slotInfo.start, end: slotInfo.end, currentEventId: '' });
+    if(this.state.selectedPilote === 'none') {
+      this.setState({ show: true, start: slotInfo.start, end: slotInfo.end, currentEventId: '' });
+    }
   }
 
   onSelectEvent(event) {
-    this.setState({ show: true, currentEventId: event._id});
+    if(this.state.selectedPilote === 'none') {
+      this.setState({ show: true, currentEventId: event._id});
+    } else {
+      const pilote = this.state.pilotes.find(pilote => pilote._id === this.state.selectedPilote);
+      if(event.isRegistered) {
+        authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/activities/id/${event._id}/pilote`, {
+          method: 'PUT',
+          body: JSON.stringify({
+            pilote,
+            action: 'unregister',
+          }),
+          headers:{
+            'Content-Type': 'application/json'
+          }
+        }).then(() => {
+          this.refresh();
+        })
+      } else {
+          authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/activities/id/${event._id}/pilote`, {
+            method: 'PUT',
+            body: JSON.stringify({
+              pilote,
+              action: 'register',
+            }),
+            headers:{
+              'Content-Type': 'application/json'
+            }
+          }).then(() => {
+            this.refresh();
+          })
+      }
+    }
   }
 
   handleClose() {
@@ -104,6 +163,10 @@ class AdminCalendar extends React.Component {
           show={this.state.show}
           refresh={this.refresh}
         />
+        <FormControl onChange={this.selectPilote} value={this.state.selectedPilote} componentClass="select">
+          <option key="none" value="none">--Choisir pilote à inscrire--</option>
+          {this.state.pilotes.sort((a,b) => a.pseudo<b.pseudo ? -1 : 1).map((datum) => <option key={datum._id} value={datum._id}>{datum.pseudo}</option>)}
+        </FormControl>
         <DragAndDropCalendar
           resizable
           events={this.state.events}
