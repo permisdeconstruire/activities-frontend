@@ -68,7 +68,7 @@ class AdminModal extends React.Component {
       annotation: '',
       step:0,
       pilote: {_id: 'none', pseudo:''},
-      published: false,
+      published: true,
       copyActivity: 'none',
       suggestions: {
         category: [],
@@ -162,7 +162,7 @@ class AdminModal extends React.Component {
       newState.place = activity.place;
       newState.annotation = activity.annotation;
       newState.cooperators = activity.cooperators;
-      newState.published = false;
+      newState.published = true;
       this.setState(newState);
     }
   }
@@ -274,7 +274,7 @@ class AdminModal extends React.Component {
   }
 
   handleDelete() {
-    const yes = window.confirm('Etes vous certains de vouloir supprimer cet événement ?');
+    const yes = window.confirm('Etes vous certain.e.s de vouloir supprimer cet événement ?');
     if(yes) {
       authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/activities/id/${this.state._id}`, {
         method: 'DELETE'

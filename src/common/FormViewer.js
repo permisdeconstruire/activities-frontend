@@ -121,7 +121,7 @@ class FormViewer extends React.Component {
   }
 
   delete(event) {
-    const yes = window.confirm('Etes vous certains de vouloir supprimer cet utilisateur ?');
+    const yes = window.confirm('Etes vous certain.e.s de vouloir supprimer cet utilisateur ?');
     if(yes) {
       authFetch(`${process.env.REACT_APP_BACKEND}/v0${this.props.api}/id/${this.state.selected}`, {
         method: 'DELETE'

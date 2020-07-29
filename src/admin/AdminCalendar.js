@@ -71,7 +71,7 @@ class AdminCalendar extends React.Component {
       .then(events => {
         this.setState({events: convertToBigCalendarEvents(events, this.state.selectedPilote)})
       })
-    authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/pilotes?filter=NOT%20ph_statut%3A%22Termin%C3%A9%22`)
+    authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/pilotes?filter=NOT%20ph_statut%3A(%22Termin%C3%A9%20Jamais%20vu%22%2C%22Termin%C3%A9%20Accueilli%22%2C%22Pas%20d'effet%20imm%C3%A9diat%22%2C%22Projet%20de%20vie%20valid%C3%A9%22%2C%20%22Projet%20de%20vie%20travaill%C3%A9%22%2C%20%22Suspension%22%2C%20%22Pause%22%2C%20%22Termin%C3%A9%22)`)
       .then(pilotes => {
         this.setState({pilotes})
       })
@@ -164,7 +164,7 @@ class AdminCalendar extends React.Component {
           refresh={this.refresh}
         />
         <FormControl onChange={this.selectPilote} value={this.state.selectedPilote} componentClass="select">
-          <option key="none" value="none">--Choisir pilote à inscrire--</option>
+          <option key="none" value="none">--Choisir pilote à inscrire puis double cliquer sur les activités où l'inscrire--</option>
           {this.state.pilotes.sort((a,b) => a.pseudo<b.pseudo ? -1 : 1).map((datum) => <option key={datum._id} value={datum._id}>{datum.pseudo}</option>)}
         </FormControl>
         <DragAndDropCalendar

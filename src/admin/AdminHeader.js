@@ -51,12 +51,19 @@ class AdminHeader extends React.Component {
           </NavDropdown>
           <NavItem eventKey={4} href="/#cooperators">Gérer les coopérateurs</NavItem>
           <NavItem eventKey={5} href="/#event">Générer un événement</NavItem>
-          <NavItem eventKey={6} href="/#forms">Éditer les formulaires</NavItem>
-          <NavItem eventKey={7} href="/#pilotes">Voir les pilotes</NavItem>
+          <NavDropdown eventKey={6} title="Outils" id="basic-nav-dropdown">
+            <NavItem eventKey={61} href="/#forms">Éditer les formulaires</NavItem>
+            <NavItem eventKey={63} href="/#parcours">Éditer les parcours</NavItem>
+            <NavItem eventKey={63} href="/#promotion">Éditer les promotions</NavItem>
+          </NavDropdown>
+          <NavDropdown eventKey={8} title="Tableaux de bord" id="basic-nav-dropdown">
+            <MenuItem eventKey={81} href="/#pilotes">Pilote</MenuItem>
+            <MenuItem eventKey={82} href="https://kibana.pdc.bug.builders/app/kibana#/dashboard/3a183350-223f-11ea-bd6c-c5bcc858dc7a" target="_blank">Réunion de synthèse</MenuItem>
+            <MenuItem eventKey={83} href="https://kibana.pdc.bug.builders/app/kibana#/dashboard/f26059f0-998d-11e9-ba12-c3b25781aada" target="_blank">Tous les pilotes</MenuItem>
+          </NavDropdown>
         </Nav>
       </Navbar>
     );
   }
 }
-
 export default AdminHeader

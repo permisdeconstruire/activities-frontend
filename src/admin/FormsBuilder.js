@@ -43,7 +43,7 @@ class FormsBuilder extends React.Component {
   }
 
   handleDelete() {
-    const yes = window.confirm('Etes vous certains de vouloir supprimer ce formulaire ?');
+    const yes = window.confirm('Etes vous certain.e.s de vouloir supprimer ce formulaire ?');
     if(yes) {
       authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/forms/id/${this.state.selectedForm._id}`, {
         method: 'DELETE'

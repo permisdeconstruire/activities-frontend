@@ -54,7 +54,7 @@ class AdminEvent extends React.Component {
     if(this.props.type === 'admin') {
       types = [ 'evaluation', 'divers', 'rdv', 'appel', 'courrier']
     }
-    authFetch(`${process.env.REACT_APP_BACKEND}/v0/${typeof(this.props.type) !== 'undefined' ? this.props.type : 'cooperator'}/pilotes?filter=NOT%20ph_statut%3A%28%22Termin%C3%A9%20Jamais%20vu%22%2C%22Termin%C3%A9%20Accueilli%22%2C%22Pas%20d%27effet%20imm%C3%A9diat%22%2C%22Projet%20de%20vie%20valid%C3%A9%22%2C%20%22Projet%20de%20vie%20travaill%C3%A9%22%29`)
+    authFetch(`${process.env.REACT_APP_BACKEND}/v0/${typeof(this.props.type) !== 'undefined' ? this.props.type : 'cooperator'}/pilotes?filter=NOT%20ph_statut%3A(%22Termin%C3%A9%20Jamais%20vu%22%2C%22Termin%C3%A9%20Accueilli%22%2C%22Pas%20d'effet%20imm%C3%A9diat%22%2C%22Projet%20de%20vie%20valid%C3%A9%22%2C%20%22Projet%20de%20vie%20travaill%C3%A9%22%2C%20%22Suspension%22%2C%20%22Pause%22%2C%20%22Termin%C3%A9%22)`)
       .then(res => {
         this.setState({piloteList: res});
       })
