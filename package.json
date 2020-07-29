@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "bootstrap": "^3",
-    "csv-parse": "^4.3.4",
+    "csv-parse": "^4.4.6",
     "date-fns": "2.0.0-alpha.2",
     "eslint": "^5.16.0",
     "font-awesome": "^4.7.0",
