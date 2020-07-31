@@ -25,7 +25,6 @@ class PiloteModal extends React.Component {
   defaultState() {
     return {
       step: 0,
-      pedagogy: [],
       justification: '',
     }
   }
@@ -37,7 +36,6 @@ class PiloteModal extends React.Component {
     this.handleUnregister = this.handleUnregister.bind(this);
     this.handleUnregistration = this.handleUnregistration.bind(this);
     this.handleRegistration = this.handleRegistration.bind(this);
-    this.handleCheckPedagogy = this.handleCheckPedagogy.bind(this);
     this.handleChangeJustification = this.handleChangeJustification.bind(this);
 
     this.state = this.defaultState();
@@ -48,20 +46,9 @@ class PiloteModal extends React.Component {
       const event = this.props.events.find(event => event._id === this.props.currentEventId)
       if(typeof(event) !== 'undefined') {
         const newState = this.defaultState();
-        newState.pedagogy = JSON.parse(JSON.stringify(event.pedagogy));
         this.setState(newState);
       }
     }
-  }
-
-  handleCheckPedagogy(index, event) {
-    const newPedagogy = this.state.pedagogy;
-    if(typeof(newPedagogy[index].checked) === 'undefined'){
-      newPedagogy[index].checked = false;
-    }
-    newPedagogy[index].checked = !newPedagogy[index].checked;
-
-    this.setState({pedagogy: newPedagogy});
   }
 
   handleRegister() {
@@ -69,7 +56,6 @@ class PiloteModal extends React.Component {
       method: 'PUT',
       body: JSON.stringify({
         action: 'register',
-        pedagogy: this.state.pedagogy.filter(p => p.checked).map(p => p.objective),
       }),
       headers:{
         'Content-Type': 'application/json'
@@ -113,6 +99,10 @@ class PiloteModal extends React.Component {
     if(typeof(event) === 'undefined') {
       return (<></>);
     }
+    let objectives = [];
+    if(typeof(event.objectives) !== 'undefined') {
+      objectives = event.objectives;
+    }
     let participants = [];
     if(typeof(event.participants) !== 'undefined'){
        participants = event.participants;
@@ -122,6 +112,26 @@ class PiloteModal extends React.Component {
 
     if(this.state.step === 0){
       stepPanel = (
+        <>
+        <Panel>
+          <Panel.Heading>Je vais travailler les objectifs suivants</Panel.Heading>
+          <Panel.Body>
+            <Form horizontal>
+              {
+                objectives.sort((a,b) => a<b ? -1 : 1).map((objective, index) => (
+                  <div key={`obj_${index}`}>
+                  <Row key={`obj_${index}`}>
+                    <Col sm={12} style={({textAlign:'justify'})}>
+                      {objective}
+                    </Col>
+                  </Row>
+                  <hr />
+                  </div>
+                ))
+              }
+            </Form>
+          </Panel.Body>
+        </Panel>
         <Panel>
           <Panel.Heading>Participants</Panel.Heading>
           <Panel.Body>
@@ -142,34 +152,7 @@ class PiloteModal extends React.Component {
             </Row>
           </Panel.Body>
         </Panel>
-      )
-    } else if(this.state.step === 1) {
-      stepPanel = (
-        <Panel>
-          <Panel.Heading>Je souhaite travailler les compétences suivantes</Panel.Heading>
-          <Panel.Body>
-            <Form horizontal>
-              {
-                this.state.pedagogy.sort((a,b) => a.category+a.subCategory+a.objective<b.category+b.subCategory+b.objective ? -1 : 1).map((pedagogy, index) => (
-                  <div key={`peda_${index}`}>
-                  <Row key={`peda_${index}`}>
-                    <Col sm={10} style={({fontWeight:'bold', lineHeight: '34px'})}>
-                      {pedagogy.category}
-                    </Col>
-                    <Col sm={2}>
-                      <Button bsStyle={pedagogy.checked ? 'success' : 'default'} onClick={this.handleCheckPedagogy.bind(this, index)}>OK</Button>
-                    </Col>
-                    <Col sm={12} style={({textAlign:'justify'})}>
-                      {`${pedagogy.objective}`}
-                    </Col>
-                  </Row>
-                  <hr />
-                  </div>
-                ))
-              }
-            </Form>
-          </Panel.Body>
-        </Panel>
+        </>
       )
     } else {
       stepPanel = (
@@ -184,11 +167,19 @@ class PiloteModal extends React.Component {
       )
     }
 
-    const allChecked = _.some(this.state.pedagogy, {checked: true})
     return (
       <Modal show={this.props.show} onHide={this.props.onClose}>
         <Modal.Header closeButton >
-          <Modal.Title><b>{event.theme}</b> - {event.title}</Modal.Title>
+          {(typeof(event.promotion) !== 'undefined' && event.promotion._id !== 'none')
+            ?
+            <>
+            <Modal.Title><b>{event.promotion.parcours}</b></Modal.Title>
+            <Modal.Title>{event.promotion.level}</Modal.Title>
+            <Modal.Title style={({marginTop: '30px'})}><b>{event.theme}</b> - {event.title}</Modal.Title>
+            </>
+            :
+            <Modal.Title><b>{event.theme}</b> - {event.title}</Modal.Title>
+          }
         </Modal.Header>
         <Modal.Body>
           {stepPanel}
@@ -199,18 +190,9 @@ class PiloteModal extends React.Component {
               {event.isRegistered ?
                 <Button onClick={this.handleUnregistration} bsStyle="danger">Se désinscrire</Button>
               :
-              <>
-                {this.state.pedagogy.length > 0 ?
-                  <Button bsStyle="success" onClick={this.handleRegistration}>S'inscrire</Button>
-                :
-                  <Button bsStyle="success" onClick={this.handleRegister}>Je m'engage à venir à l'activité</Button>
-                }
-              </>
+                <Button bsStyle="success" onClick={this.handleRegister}>S'inscrire</Button>
               }
             </>
-          }
-          {this.state.step === 1 && allChecked &&
-            <Button bsStyle="success" onClick={this.handleRegister}>Je m'engage à venir à l'activité</Button>
           }
           {this.state.step === 2 &&
             <>

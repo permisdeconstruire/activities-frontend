@@ -17,7 +17,6 @@ import DatePicker from 'react-datepicker'
 import { registerLocale }  from 'react-datepicker'
 import fr from 'date-fns/locale/fr';
 import {authFetch, listCooperators} from '../common/utils'
-import Pedagogy from '../common/Pedagogy'
 registerLocale('fr', fr);
 
 const dateFormat = 'dd/MM/YYYY HH:mm'
@@ -30,8 +29,9 @@ const status = [
   'Fermeture',
   'Autonomie',
   'Socio-éducatif',
-  'Individuelle'
-].concat(pillars)
+  'Individuelle',
+  'Parcours',
+]
 
 function getSuggestionValue(suggestion) {
   return suggestion
@@ -49,6 +49,7 @@ class AdminModal extends React.Component {
 
   allCooperators = []
   allPilotes = []
+  allPromotions = []
 
   defaultState() {
     return {
@@ -57,10 +58,17 @@ class AdminModal extends React.Component {
       start: new Date(),
       end: new Date(),
       status: status[0],
-      level: 0,
+      promotion: {
+        _id: 'none',
+        name: '',
+        level: '',
+        parcours: '',
+      },
+      sessions: [],
+      level: '',
       theme: '',
       cooperators: ['none'],
-      pedagogy: [],
+      objectives: [],
       participants: [],
       cost: 0,
       estimated: 0,
@@ -81,6 +89,9 @@ class AdminModal extends React.Component {
   constructor(props, context) {
     super(props, context);
 
+    this.handleChangePromotion = this.handleChangePromotion.bind(this);
+    this.handleChangeSession = this.handleChangeSession.bind(this);
+
     this.handleClose = this.handleClose.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleNavigation = this.handleNavigation.bind(this);
@@ -88,9 +99,6 @@ class AdminModal extends React.Component {
     this.handleChangeDate = this.handleChangeDate.bind(this);
     this.handleChangePublished = this.handleChangePublished.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
-    this.addPedagogy = this.addPedagogy.bind(this);
-    this.deletePedagogy = this.deletePedagogy.bind(this);
-    this.handleChangePedagogy = this.handleChangePedagogy.bind(this);
 
     this.addCooperator = this.addCooperator.bind(this);
     this.deleteCooperator = this.deleteCooperator.bind(this);
@@ -114,32 +122,78 @@ class AdminModal extends React.Component {
     listCooperators()
       .then(res => {
         this.allCooperators = res;
-        return authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/pilotes`)
+        return authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/promotions`)
       })
       .then(res => {
-        this.allPilotes = res;
+        this.allPromotions = res;
       })
   }
 
   componentDidUpdate(prevProps, prevState) {
+    this.allPilotes = this.props.allPilotes;
     if(prevProps.currentEventId !== this.props.currentEventId || prevProps.start.toString() !== this.props.start.toString() || prevProps.end.toString() !== this.props.end.toString()) {
       let newState;
       if(this.props.currentEventId === '' || this.props.currentEventId === null) {
         newState = this.defaultState();
         newState.start = this.props.start;
         newState.end = this.props.end;
+        newState.step = 0;
+        this.setState(newState);
       } else {
         newState = this.props.events.find(event => event._id === this.props.currentEventId)
+        newState.step = 0;
+        if(typeof(newState.promotion) !== 'undefined') {
+          const promotion = this.allPromotions.find(p => p._id === newState.promotion._id)
+          newState.promotion = promotion;
+          authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/parcours/title/${promotion.parcours}`)
+          .then((parcours) => {
+            const sessions = [];
+            for(let i = 0; i < parcours.length; i += 1) {
+              for(let j = 0; j < parcours[i].sessions.length; j += 1) {
+                const session = parcours[i].sessions[j];
+                sessions.push({
+                  ...session,
+                  level: parcours[i].level,
+                })
+              }
+            }
+            newState.sessions = sessions;
+
+            this.setState(newState);
+          })
+        } else {
+          this.setState(newState);
+        }
       }
-      newState.step = 0;
-      this.setState(newState);
+
     } else {
       const newState = this.props.events.find(e => e._id === this.props.currentEventId)
       if(typeof(newState) !== 'undefined' && (typeof(this.state.participants) !== typeof(newState.participants) || (typeof(newState.participants) !== 'undefined' && this.state.participants.toString() !== newState.participants.toString()))){
         if(typeof(newState.participants) === 'undefined'){
           newState.participants = [];
         }
-        this.setState(newState);
+        newState.step = 0;
+        if(typeof(newState.promotion) !== 'undefined') {
+          const promotion = this.allPromotions.find(p => p._id === newState.promotion._id)
+          newState.promotion = promotion;
+          authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/parcours/title/${promotion.parcours}`)
+          .then((parcours) => {
+            const sessions = [];
+            for(let i = 0; i < parcours.length; i += 1) {
+              for(let j = 0; j < parcours[i].sessions.length; j += 1) {
+                const session = parcours[i].sessions[j];
+                sessions.push({
+                  ...session,
+                  level: parcours[i].level,
+                })
+              }
+            }
+            newState.sessions = sessions;
+            this.setState(newState);
+          })
+        } else {
+          this.setState(newState);
+        }
       }
     }
   }
@@ -154,9 +208,8 @@ class AdminModal extends React.Component {
       const activity = this.props.events.find(activity => activity._id === event.target.value)
       newState.title = activity.title;
       newState.status = activity.status;
-      newState.level = activity.level;
+      newState.objectives = activity.objectives;
       newState.theme = activity.theme;
-      newState.pedagogy = activity.pedagogy;
       newState.cost = activity.cost;
       newState.estimated = activity.estimated;
       newState.place = activity.place;
@@ -182,37 +235,26 @@ class AdminModal extends React.Component {
     })
   }
 
-  handleRegisterPilote() {
-    authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/activities/id/${this.state._id}/pilote`, {
+  registerPilote(participant, eventId) {
+    return authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/activities/id/${eventId}/pilote`, {
       method: 'PUT',
       body: JSON.stringify({
-        pilote: this.state.pilote,
+        pilote: participant,
         action: 'register',
       }),
       headers:{
         'Content-Type': 'application/json'
       }
-    }).then(() => {
-      this.props.refresh();
     })
   }
 
-  deletePedagogy(index) {
-    const newPedagogy = this.state.pedagogy;
-    newPedagogy.splice(index, 1);
-    this.setState({pedagogy: newPedagogy})
-  }
-
-  addPedagogy() {
-    const newState = this.state;
-    newState.pedagogy.push({category: 'none', subCategory: 'none', objective: 'none'})
-    this.setState(newState)
-  }
-
-  handleChangePedagogy(index, peda) {
-    const newPedagogy = this.state.pedagogy;
-    newPedagogy[index] = peda;
-    this.setState({pedagogy: newPedagogy})
+  handleRegisterPilote(refresh = true) {
+    this.registerPilote(this.state.pilote, this.state._id)
+    .then(() => {
+      if(refresh){
+        this.props.refresh();
+      }
+    })
   }
 
   deleteCooperator(index) {
@@ -251,6 +293,54 @@ class AdminModal extends React.Component {
     this.setState(newState);
   }
 
+  handleChangeSession(event) {
+    const session = this.state.sessions.find(s => s.title === event.target.value)
+    const promotion = this.state.promotion
+    if(typeof(session) !== 'undefined') {
+      promotion.level = session.level;
+      this.setState({theme: session.title, objectives: session.objectives, promotion});
+    } else {
+      promotion.level = '';
+      this.setState({
+        theme: '',
+        objectives: [],
+        promotion,
+      })
+    }
+  }
+
+  handleChangePromotion(event) {
+    const promotion = this.allPromotions.find(p => p._id === event.target.value)
+    if(typeof(promotion) !== 'undefined') {
+      delete promotion.level;
+      authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/parcours/title/${promotion.parcours}`)
+        .then((parcours) => {
+          const sessions = [];
+          for(let i = 0; i < parcours.length; i += 1) {
+            for(let j = 0; j < parcours[i].sessions.length; j += 1) {
+              const session = parcours[i].sessions[j];
+              sessions.push({
+                ...session,
+                level: parcours[i].level,
+              })
+            }
+          }
+          this.setState({promotion, sessions: sessions});
+        })
+    } else {
+      this.setState({
+        promotion: {
+          id: 'none',
+          name: '',
+          level: '',
+          parcours: '',
+        },
+        sessions: [],
+      })
+    }
+
+  }
+
   handleChange(field, event){
     const newState = {}
     if(['level'].indexOf(field) !== -1) {
@@ -265,9 +355,6 @@ class AdminModal extends React.Component {
     const newState = {}
     if(typeof(index) === 'undefined') {
       newState[field] = newValue
-    } else {
-      newState.pedagogy = this.state.pedagogy;
-      newState.pedagogy[index][field] = newValue
     }
 
     this.setState(newState);
@@ -288,11 +375,7 @@ class AdminModal extends React.Component {
 
   getSuggestions(field, index, value) {
     let suggestions;
-    if(field === 'subCategory') {
-      suggestions = _.uniqBy(this.allPedagogy.filter(pedagogy => pedagogy.category === this.state.pedagogy[index].category), field).map(pedagogy => pedagogy[field])
-    } else if(field === 'category') {
-      suggestions = _.uniqBy(this.allPedagogy, field).map(pedagogy => pedagogy[field])
-    } else if(field === 'theme') {
+    if(field === 'theme') {
       suggestions = _.uniqBy(this.props.events, 'theme').map(event => event.theme)
     }
 
@@ -328,9 +411,14 @@ class AdminModal extends React.Component {
       start: this.state.start,
       end: this.state.end,
       status: this.state.status,
-      level: this.state.level,
       theme: this.state.theme,
-      pedagogy: this.state.pedagogy,
+      promotion: {
+        _id: this.state.promotion._id,
+        name: this.state.promotion.name,
+        parcours: this.state.promotion.parcours,
+        level: this.state.promotion.level,
+      },
+      objectives: this.state.objectives,
       cost: this.state.cost,
       estimated: this.state.estimated,
       place: this.state.place,
@@ -348,8 +436,17 @@ class AdminModal extends React.Component {
         }
       })
       .then(res => {
-        this.props.onClose();
-        this.props.refresh();
+        if(this.state.status === 'Parcours') {
+          this.registerPilote(this.state.promotion.pilotes, this.state._id)
+            .then(() => {
+              this.props.onClose();
+              this.props.refresh();
+            })
+        } else {
+          this.props.onClose();
+          this.props.refresh();
+        }
+
       })
     } else {
       authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/activities`, {
@@ -360,8 +457,17 @@ class AdminModal extends React.Component {
         }
       })
       .then(res => {
-        this.props.onClose();
-        this.props.refresh();
+        if(this.state.status === 'Parcours') {
+          this.registerPilote(this.state.promotion.pilotes, res)
+            .then(() => {
+              this.props.onClose();
+              this.props.refresh();
+            })
+        } else {
+          this.props.onClose();
+          this.props.refresh();
+        }
+
       })
     }
   }
@@ -380,45 +486,58 @@ class AdminModal extends React.Component {
 
   render() {
     let form;
-
     if(this.state.step === 0) {
       form = (
         <Form horizontal>
-          <Panel>
-            <Panel.Heading>Parcours</Panel.Heading>
-            <Panel.Body>
-              <FormGroup controlId="formHorizontalStatusAndTheme">
-                <Col componentClass={ControlLabel} sm={2}>
-                  Status
-                </Col>
-                <Col sm={4}>
-                  <FormControl onChange={this.handleChange.bind(this, 'status')} value={this.state.status} componentClass="select">
-                    {status.map((status) => <option key={status} value={status}>{status}</option>)}
-                  </FormControl>
-                </Col>
-                <Col componentClass={ControlLabel} sm={2}>
-                  Niveau
-                </Col>
-                <Col sm={4}>
-                  <FormControl onChange={this.handleChange.bind(this, 'level')} value={this.state.level} componentClass="select">
-                    {[0,1,2,3,4].map(l => <option key={l} value={l}>{l}</option>)}
-                  </FormControl>
-                </Col>
-              </FormGroup>
-            </Panel.Body>
-          </Panel>
-
           <FormGroup controlId="formHorizontalClone">
-          <Col componentClass={ControlLabel} sm={4}>
-            Copier ancienne activité
-          </Col>
-          <Col sm={8}>
-            <FormControl onChange={this.copyActivity} value={this.state.copyActivity} componentClass="select">
-              <option key="none" value="none">-- Partir de zéro --</option>
-              {this.genCopyActivity()}
-            </FormControl>
-          </Col>
-        </FormGroup>
+            <Col componentClass={ControlLabel} sm={4}>
+              Copier ancienne activité
+            </Col>
+            <Col sm={8}>
+              <FormControl onChange={this.copyActivity} value={this.state.copyActivity} componentClass="select">
+                <option key="none" value="none">-- Partir de zéro --</option>
+                {this.genCopyActivity()}
+              </FormControl>
+            </Col>
+          </FormGroup>
+          <hr></hr>
+          <FormGroup controlId="formHorizontalStatus">
+            <Col componentClass={ControlLabel} sm={4}>
+              Type d'activité
+            </Col>
+            <Col sm={8}>
+                <FormControl onChange={this.handleChange.bind(this, 'status')} value={this.state.status} componentClass="select">
+                  {status.map((status) => <option key={status} value={status}>{status}</option>)}
+                </FormControl>
+            </Col>
+          </FormGroup>
+            {this.state.status === 'Parcours' &&
+              <Panel>
+                <Panel.Heading>Parcours</Panel.Heading>
+                <Panel.Body>
+                  <Row style={({padding: '1em'})}>
+                    <Col>
+                      <FormControl onChange={this.handleChangePromotion} value={this.state.promotion._id} componentClass="select">
+                        <option key="none" value="none">-- Promotion --</option>
+                        {this.allPromotions.map((p) => <option key={p._id} value={p._id}>{`${p.name}`}</option>)}
+                      </FormControl>
+                    </Col>
+                    <Col style={({marginTop: '20px', fontWeight: 'bold'})}>
+                      {this.state.promotion.parcours}
+                    </Col>
+                    <Col>
+                      {this.state.promotion.level}
+                    </Col>
+                    <Col style={({marginTop: '20px'})}>
+                      <FormControl onChange={this.handleChangeSession} value={this.state.theme} componentClass="select">
+                        <option key="none" value="">-- Séance --</option>
+                        {this.state.sessions.map(s => <option key={s.title} value={s.title}>{s.title}</option>)}
+                      </FormControl>
+                    </Col>
+                  </Row>
+                </Panel.Body>
+              </Panel>
+            }
           <Panel>
             <Panel.Heading>Informations</Panel.Heading>
             <Panel.Body>
@@ -430,7 +549,7 @@ class AdminModal extends React.Component {
                   <input type="checkbox" className="btn-sm" checked={this.state.published ? 'checked' : ''} onChange={this.handleChangePublished}/>
                 </Col>
               </FormGroup>
-              <FormGroup controlId="formHorizontalStatusAndTheme">
+              <FormGroup controlId="formHorizontalActivity">
                 <Col componentClass={ControlLabel} sm={2}>
                   Activité
                 </Col>
@@ -567,7 +686,7 @@ class AdminModal extends React.Component {
               </FormGroup>
             </Panel.Body>
           </Panel>
-          <Panel>
+          {/* <Panel>
             <Panel.Heading>Pédagogie</Panel.Heading>
             <Panel.Body>
               {this.state.pedagogy.map((pedagogy, index) =>
@@ -587,7 +706,7 @@ class AdminModal extends React.Component {
                 </Col>
               </FormGroup>
             </Panel.Body>
-          </Panel>
+          </Panel> */}
           <FormGroup>
             <Col style={({marginLeft:'10px'})}>
               <Button bsStyle="primary" onClick={this.handleNavigation.bind(this, 0)}>Précédent</Button>
@@ -610,15 +729,21 @@ class AdminModal extends React.Component {
           </Row>
           <hr />
           <Row>
-            <Col sm={8}>
-              <FormControl onChange={this.handleChangePilote} value={this.state.pilote._id} componentClass="select">
-                <option key="none" value="none">------</option>
-                {this.allPilotes.sort((a,b) => a.pseudo<b.pseudo ? -1 : 1).map((p) => <option key={p._id} value={p._id}>{p.pseudo}</option>)}
-              </FormControl>
-            </Col>
-            <Col sm={3}>
-              <Button bsStyle="primary" onClick={this.handleRegisterPilote}>Ajouter participant</Button>
-            </Col>
+            {this.state._id === '' ?
+              <Col sm={12}>Merci de créer l'activité d'abord (Précédent puis Sauvegarder)</Col>
+            :
+            <>
+              <Col sm={8}>
+                <FormControl onChange={this.handleChangePilote} value={this.state.pilote._id} componentClass="select">
+                  <option key="none" value="none">------</option>
+                  {this.allPilotes.sort((a,b) => a.pseudo<b.pseudo ? -1 : 1).map((p) => <option key={p._id} value={p._id}>{p.pseudo}</option>)}
+                </FormControl>
+              </Col>
+              <Col sm={3}>
+                <Button bsStyle="primary" onClick={this.handleRegisterPilote}>Ajouter participant</Button>
+              </Col>
+            </>
+            }
           </Row>
         </>
       )
@@ -633,11 +758,17 @@ class AdminModal extends React.Component {
           {form}
         </Modal.Body>
         <Modal.Footer>
-          <Button bsStyle="success" onClick={this.handleSubmit}>Sauvegarder</Button>
-          {this.state._id !== '' &&
-            <Button onClick={this.handleDelete} bsStyle="danger">Supprimer</Button>
+          {this.state.step !== 2 ?
+            <>
+              <Button bsStyle="success" onClick={this.handleSubmit}>Sauvegarder</Button>
+              {this.state._id !== '' &&
+                <Button onClick={this.handleDelete} bsStyle="danger">Supprimer</Button>
+              }
+              <Button onClick={this.handleClose} bsStyle="default">Fermer</Button>
+            </>
+              :
+              <Button bsStyle="primary" onClick={this.handleNavigation.bind(this, 0)}>Précédent</Button>
           }
-          <Button onClick={this.handleClose} bsStyle="default">Fermer</Button>
         </Modal.Footer>
       </Modal>
     )

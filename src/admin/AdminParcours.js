@@ -77,7 +77,6 @@ class AdminParcours extends React.Component {
       const currentParcours = this.state.currentParcours
       currentParcours.level = ''
       currentParcours.sessions = []
-      console.log(this.state.parcours);
       this.setState({...this.state, selectedLevel: event.target.value, currentParcours});
     } else {
       const currentParcours = JSON.parse(JSON.stringify(this.state.parcours.find(p => p._id === event.target.value)))
@@ -229,7 +228,7 @@ class AdminParcours extends React.Component {
             {this.state.selectedLevel !== 'none' ?
               <Button bsStyle="success" onClick={this.handleSubmit}>Sauvegarder</Button>
               :
-              <Button bsStyle="success" onClick={this.handleSubmit}>Créer</Button>
+              <Button bsStyle="success" onClick={this.handleSubmit}>Créer nouveau parcours</Button>
             }
           </div>
         </Col>

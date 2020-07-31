@@ -9,25 +9,29 @@ function getQueryVariable(variable) {
     }
 }
 
-function colorActivity(status) {
+function colorActivity(status, parcours) {
   if (status === 'Autonomie') {
     return 'autonomieActivity'
   } else if (status === 'Socio-éducatif') {
     return 'socioeducatifActivity'
-  } else if (status === 'Projet professionnel') {
-    return 'projetprofessionelActivity'
-  } else if (status === 'La Relation') {
-    return 'larelationActivity'
   } else if (status === 'Fermeture') {
     return 'fermetureActivity'
-  } else if (status === 'Les Soins pour Soi') {
-    return 'lessoinspoursoiActivity'
-  } else if (status === 'Booster sa candidature') {
-    return 'boostersacandidatureActivity';
   } else if (status === 'Individuelle') {
     return 'individuelleActivity';
-  } else if (status === 'Insertion sociale') {
-    return 'insertionsocialeActivity';
+  } else if (status === 'Parcours') {
+    if(parcours === 'Élaboration de son projet professionnel') {
+      return 'projetprofessionelActivity'
+    } else if (status === 'La relation') {
+      return 'larelationActivity'
+    } else if (status === 'Les soins pour soi') {
+      return 'lessoinspoursoiActivity'
+    } else if (status === 'Boost ta candidature') {
+      return 'boostersacandidatureActivity';
+    } else if (status === 'Insertion sociale') {
+      return 'insertionsocialeActivity';
+    } else if (status === 'Conscience de soi') {
+      return 'larelationActivity';
+    }
   }
 }
 

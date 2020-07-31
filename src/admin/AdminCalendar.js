@@ -155,6 +155,7 @@ class AdminCalendar extends React.Component {
     return (
       <>
         <AdminModal
+          allPilotes={this.state.pilotes}
           events={this.state.events}
           start={this.state.start}
           end={this.state.end}

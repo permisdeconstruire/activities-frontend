@@ -34,6 +34,7 @@ class CooperatorModal extends React.Component {
     return {
       step: 0,
       pedagogy: [],
+      objectives: [],
       pilote: {_id: 'none', pseudo: '', pedagogy:[]},
       comments: [],
       evaluations: [],
@@ -78,11 +79,21 @@ class CooperatorModal extends React.Component {
       .then(res => {
         const newState = this.defaultState();
         const event = this.props.events.find(event => event.id === this.props.currentEventId)
-        newState.pedagogy = JSON.parse(JSON.stringify(event.pedagogy));
-        newState.pedagogy.forEach(a => {
-          newState.comments.push('')
-          newState.evaluations.push(-1)
-        })
+
+        if(typeof(event.pedagogy) !== 'undefined') {
+          newState.pedagogy = JSON.parse(JSON.stringify(event.pedagogy));
+          newState.pedagogy.forEach(a => {
+            newState.comments.push('')
+            newState.evaluations.push(-1)
+          })
+        }
+        if(typeof(event.objectives) !== 'undefined') {
+          newState.objectives = JSON.parse(JSON.stringify(event.objectives));
+          newState.objectives.forEach(a => {
+            newState.comments.push('')
+            newState.evaluations.push(-1)
+          })
+        }
         this.setState(newState);
       })
   }
@@ -150,16 +161,47 @@ class CooperatorModal extends React.Component {
       }))
     }
 
+    const event = this.props.events.find(event => event.id === this.props.currentEventId)
+    for(let i = 0; i < this.state.objectives.length; i += 1){
+      const data = {
+        pilote: {_id: this.state.pilote._id, pseudo: this.state.pilote.pseudo},
+        comment: this.state.comments[i],
+        data: {
+          parcours: event.promotion.parcours,
+          promotion: event.promotion.name,
+          objective: this.state.objectives[i],
+          evaluation: this.state.evaluations[i],
+        }
+      }
+
+      eventPromises.push(authFetch(`${process.env.REACT_APP_BACKEND}/v0/cooperator/activities/id/${this.props.currentEventId}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+        headers:{
+          'Content-Type': 'application/json'
+        }
+      }))
+    }
+
     Promise.all(eventPromises)
       .then(res => {
         alert('Évaluation envoyée.');
         const newState = this.defaultState();
         const event = this.props.events.find(event => event.id === this.props.currentEventId)
-        newState.pedagogy = JSON.parse(JSON.stringify(event.pedagogy));
-        newState.pedagogy.forEach(a => {
-          newState.comments.push('')
-          newState.evaluations.push(-1)
-        })
+        if(typeof(event.pedagogy) !== 'undefined') {
+          newState.pedagogy = JSON.parse(JSON.stringify(event.pedagogy));
+          newState.pedagogy.forEach(a => {
+            newState.comments.push('')
+            newState.evaluations.push(-1)
+          })
+        }
+        if(typeof(event.objectives) !== 'undefined') {
+          newState.objectives = JSON.parse(JSON.stringify(event.objectives));
+          newState.objectives.forEach(a => {
+            newState.comments.push('')
+            newState.evaluations.push(-1)
+          })
+        }
         this.setState(newState);
       })
   }
@@ -182,12 +224,14 @@ class CooperatorModal extends React.Component {
     if(typeof(selectedPilote) === 'undefined') {
       this.setState({pilote: {_id: 'none', pseudo: '', pedagogy: []}})
     } else {
-      this.getEvent(selectedPilote._id).then((events) => {
-        const comments = events.evaluations.map(e => e.comment)
-        const evaluations = events.evaluations.map(e => e.evaluation)
+      if(event.isCooperator) {
+        this.getEvent(selectedPilote._id).then((events) => {
+          const comments = events.evaluations.map(e => e.comment)
+          const evaluations = events.evaluations.map(e => e.evaluation)
 
-        this.setState({pilote: selectedPilote, comments, evaluations, globalPiloteComments: events.globalPiloteComments});
-      })
+          this.setState({pilote: selectedPilote, comments, evaluations, globalPiloteComments: events.globalPiloteComments});
+        })
+      }
     }
 
   }
@@ -204,11 +248,20 @@ class CooperatorModal extends React.Component {
         if(typeof(event.cooperatorComments) !== 'undefined') {
           newState.globalActivityComments = event.cooperatorComments;
         }
-        newState.pedagogy = JSON.parse(JSON.stringify(event.pedagogy));
-        newState.pedagogy.forEach(a => {
-          newState.comments.push('')
-          newState.evaluations.push(-1)
-        })
+        if(typeof(event.pedagogy) !== 'undefined') {
+          newState.pedagogy = JSON.parse(JSON.stringify(event.pedagogy));
+          newState.pedagogy.forEach(a => {
+            newState.comments.push('')
+            newState.evaluations.push(-1)
+          })
+        }
+        if(typeof(event.objectives) !== 'undefined') {
+          newState.objectives = JSON.parse(JSON.stringify(event.objectives));
+          newState.objectives.forEach(a => {
+            newState.comments.push('')
+            newState.evaluations.push(-1)
+          })
+        }
         this.setState(newState);
       }
     }
@@ -258,6 +311,27 @@ class CooperatorModal extends React.Component {
                       <Col sm={2}><b>Critère</b></Col>
                       <Col sm={10} style={({textAlign:'justify', marginBottom: '20px'})}>
                         {`${pedagogy.indicator !== '' ? pedagogy.indicator : 'Non défini'}`}
+                      </Col>
+                      <Col sm={8}>
+                        <FormControl onChange={this.handleChangeComment.bind(this, index)} value={this.state.comments[index]} type="text" readOnly={!event.isCooperator} placeholder="Commentaires" />
+                      </Col>
+                      <Col sm={4}>
+                        <FormControl readOnly={!event.isCooperator} onChange={this.handleChangeEvaluation.bind(this, index)} value={this.state.evaluations[index]} componentClass="select">
+                          <option key="none" value="-1">-- Evaluation --</option>
+                          {evaluations.map(evaluation => <option key={evaluation.name} value={evaluation.value}>{evaluation.name}</option>)}
+                        </FormControl>
+                      </Col>
+                    </Row>
+                    <hr />
+                    </div>
+                  ))
+                }
+                {
+                  this.state.objectives.sort((a,b) => a<b ? -1 : 1).map((objective, index) => (
+                    <div key={`obj_${index}`}>
+                    <Row key={`obj_${index}`}>
+                      <Col sm={12} style={({fontWeight:'bold', lineHeight: '20px'})}>
+                        {objective}
                       </Col>
                       <Col sm={8}>
                         <FormControl onChange={this.handleChangeComment.bind(this, index)} value={this.state.comments[index]} type="text" readOnly={!event.isCooperator} placeholder="Commentaires" />

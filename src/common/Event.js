@@ -1,7 +1,5 @@
 import React from 'react'
 
-const parcours = ['Projet professionnel', 'La Relation', 'Les Soins pour Soi', 'Booster sa candidature', 'Insertion sociale']
-
 class Event extends React.Component {
 
   render(){
@@ -27,10 +25,22 @@ class Event extends React.Component {
       )
     }
 
-    let prefix = 'Activité';
-    if(parcours.indexOf(this.props.event.status) !== -1) {
-      prefix = 'Parcours';
+    if(this.props.event.status === 'Parcours') {
+      return (
+        <>
+          <div className='new-rbc-event-label'>Promotion {this.props.event.promotion.name}</div>
+          <div className='event-title'><b>{this.props.event.theme}</b> - {this.props.event.title}</div>
+          <div className='event-place'>
+            <a href={`https://www.google.com/maps/search/${this.props.event.place}`} target="_blank" rel="noopener noreferrer">{this.props.event.place}</a>
+          </div>
+          <div className='event-annotation'>{this.props.event.annotation}</div>
+          <div className='event-participants'>{this.props.event.cooperators.map(cooperator => cooperator.titre).join(' & ')}</div>
+        </>
+      )
     }
+
+    let prefix = 'Activité';
+
     return (
       <>
         <div className='new-rbc-event-label'>{prefix} {this.props.event.status}</div>
