@@ -16,12 +16,22 @@ import {authFetch} from '../common/utils'
 
 const regexPilote = new RegExp('__PILOTE_ID_HERE__', 'gi');
 
+const evaluationColor = {
+  '-1': 'black',
+  '0': '#7a7a7a',
+  '1': '#e80000',
+  '2': '#e89300',
+  '3': '#00d107',
+}
+
 class AdminPilotes extends React.Component {
 
   defaultState() {
     return {
       options: {kibana:'#'},
       pilotes: [],
+      allActivities: [],
+      objectives: [],
       pilote: {_id: 'none', pseudo: ''},
     };
   }
@@ -32,28 +42,73 @@ class AdminPilotes extends React.Component {
     this.state = this.defaultState();
   }
 
-  select(event) {
+  async select(event) {
     const pilote = this.state.pilotes.find(p => p._id === event.target.value);
     if(typeof(pilote) === 'undefined') {
       this.setState({pilote: {_id: 'none', pseudo:''}});
     } else {
       this.setState({pilote: {_id: pilote._id, pseudo: pilote.pseudo}});
     }
-    authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/pilotes/id/${pilote._id}`)
-      .then(res => {
-        this.setState({data: res})
+
+    const promotions = this.state.promotions.filter(p => typeof(p.pilotes.find(p2 => p2._id === pilote._id)) !== 'undefined' )
+    const allActivities = []
+    for(let i = 0; i < promotions.length; i += 1) {
+      const promotion = promotions[i];
+      allActivities.push({
+        startDate: (new Date(promotion.startDate)).toLocaleDateString(),
+        endDate: promotion.endDate.startsWith('20') ? (new Date(promotion.endDate)).toLocaleDateString() : 'en cours',
+        name: promotion.name,
+        parcours: promotion.parcours,
+        sessions: []
       })
+
+      const evaluations = await authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/activities/promotion/${promotion._id}/pilote/${pilote._id}?startDate=${promotion.startDate}`)
+
+      const activities = await authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/activities/promotion/${promotion._id}`)
+      for(let j = 0; j < activities.length; j += 1) {
+        const activity = activities[j];
+        const objectives = [];
+        for(let k = 0; k < activity.objectives.length; k += 1) {
+          const objective = activity.objectives[k];
+          const evaluation = evaluations.find(e => e.objective === objective);
+          if(typeof(evaluation) !== 'undefined') {
+            objectives.push({
+              evaluation: evaluation.evaluation,
+              objective,
+            })
+          } else {
+            objectives.push({
+              evaluation: -1,
+              objective,
+            })
+          }
+        }
+
+        allActivities[allActivities.length - 1].sessions.push({
+          theme: activity.theme,
+          title: activity.title,
+          objectives,
+        })
+      }
+    }
+
+    this.setState({allActivities});
   }
 
   update() {
     let pilotes;
+    let options;
     authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/pilotes`)
       .then(res => {
         pilotes = res;
         return authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/options`)
       })
       .then(res => {
-        this.setState({pilotes, options: res})
+        options = res
+        return authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/promotions`)
+      })
+      .then(res => {
+        this.setState({pilotes, options, promotions: res})
       })
   }
 
@@ -82,10 +137,28 @@ class AdminPilotes extends React.Component {
           </Col>
         </Row>
       }
-      {typeof(this.state.data) !== 'undefined' &&
-        <Row>
-          <FilePilote pilote={this.state.pilote} data={this.state.data} />
-        </Row>
+      {
+        this.state.allActivities.map((a,i) =>
+          <Row key={`a_${i}`}>
+            <Col sm={8} style={({margin: 'auto', 'marginTop': '10px'})}>
+            <h3>Promotion {a.name} ({a.startDate} {a.endDate}) - {a.parcours}</h3>
+            {
+              a.sessions.map((s, j) =>
+                  <div  key={`s_${j}`} >
+                  <h4>{s.theme} {s.title}</h4>
+                  <ul>
+                    {
+                      s.objectives.map((o, k) =>
+                        <li key={`o_${k}`} style={({color: evaluationColor[o.evaluation]})}>{o.objective}</li>
+                      )
+                    }
+                  </ul>
+                  </div>
+              )
+            }
+            </Col>
+          </Row>
+        )
       }
       </>
     )
