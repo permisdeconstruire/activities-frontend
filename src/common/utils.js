@@ -21,15 +21,15 @@ function colorActivity(status, parcours) {
   } else if (status === 'Parcours') {
     if(parcours === 'Élaboration de son projet professionnel') {
       return 'projetprofessionelActivity'
-    } else if (status === 'La relation') {
+    } else if (parcours === 'La relation') {
       return 'larelationActivity'
-    } else if (status === 'Les soins pour soi') {
+    } else if (parcours === 'Les soins pour soi') {
       return 'lessoinspoursoiActivity'
-    } else if (status === 'Boost ta candidature') {
+    } else if (parcours === 'Boost ta candidature') {
       return 'boostersacandidatureActivity';
-    } else if (status === 'Insertion sociale') {
+    } else if (parcours === 'Insertion sociale') {
       return 'insertionsocialeActivity';
-    } else if (status === 'Conscience de soi') {
+    } else if (parcours === 'Conscience de soi') {
       return 'larelationActivity';
     }
   }

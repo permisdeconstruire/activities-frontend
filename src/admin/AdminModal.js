@@ -142,25 +142,29 @@ class AdminModal extends React.Component {
       } else {
         newState = this.props.events.find(event => event._id === this.props.currentEventId)
         newState.step = 0;
-        if(typeof(newState.promotion) !== 'undefined') {
+        if(typeof(newState.promotion) !== 'undefined' && newState.promotion._id !== 'none') {
           const promotion = this.allPromotions.find(p => p._id === newState.promotion._id)
-          newState.promotion = promotion;
-          authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/parcours/title/${promotion.parcours}`)
-          .then((parcours) => {
-            const sessions = [];
-            for(let i = 0; i < parcours.length; i += 1) {
-              for(let j = 0; j < parcours[i].sessions.length; j += 1) {
-                const session = parcours[i].sessions[j];
-                sessions.push({
-                  ...session,
-                  level: parcours[i].level,
-                })
+          if(typeof(promotion) !== 'undefined') {
+            newState.promotion = promotion;
+            authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/parcours/title/${promotion.parcours}`)
+            .then((parcours) => {
+              const sessions = [];
+              for(let i = 0; i < parcours.length; i += 1) {
+                for(let j = 0; j < parcours[i].sessions.length; j += 1) {
+                  const session = parcours[i].sessions[j];
+                  sessions.push({
+                    ...session,
+                    level: parcours[i].level,
+                  })
+                }
               }
-            }
-            newState.sessions = sessions;
+              newState.sessions = sessions;
 
+              this.setState(newState);
+            })
+          } else {
             this.setState(newState);
-          })
+          }
         } else {
           this.setState(newState);
         }
@@ -173,7 +177,7 @@ class AdminModal extends React.Component {
           newState.participants = [];
         }
         newState.step = 0;
-        if(typeof(newState.promotion) !== 'undefined') {
+        if(typeof(newState.promotion) !== 'undefined' && newState.promotion._id !== 'none') {
           const promotion = this.allPromotions.find(p => p._id === newState.promotion._id)
           newState.promotion = promotion;
           authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/parcours/title/${promotion.parcours}`)
