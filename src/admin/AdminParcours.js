@@ -47,7 +47,7 @@ class AdminParcours extends React.Component {
   delete(event) {
     const yes = window.confirm('Etes vous certain.e.s de vouloir supprimer ce parcours ?');
     if(yes) {
-      authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/parcours/id/${this.state.selectedLevel}`, {
+      authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/admin/parcours/id/${this.state.selectedLevel}`, {
         method: 'DELETE'
       })
       .then(res => {
@@ -118,7 +118,7 @@ class AdminParcours extends React.Component {
   }
 
   updateParcours() {
-    authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/parcours`)
+    authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/admin/parcours`)
       .then(res => {
         const newState = this.defaultState();
         newState.parcours = res;
@@ -144,7 +144,7 @@ class AdminParcours extends React.Component {
 
   handleSubmit() {
     if(this.state.selectedLevel === 'none') {
-      authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/parcours`, {
+      authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/admin/parcours`, {
         method: 'POST',
         body: JSON.stringify(this.state.currentParcours),
         headers:{
@@ -155,7 +155,7 @@ class AdminParcours extends React.Component {
         this.updateParcours()
       })
     } else {
-      authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/parcours/id/${this.state.selectedLevel}`, {
+      authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/admin/parcours/id/${this.state.selectedLevel}`, {
         method: 'PUT',
         body: JSON.stringify(this.state.currentParcours),
         headers:{

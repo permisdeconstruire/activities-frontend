@@ -52,7 +52,7 @@ class PiloteModal extends React.Component {
   }
 
   handleRegister() {
-    authFetch(`${process.env.REACT_APP_BACKEND}/v0/pilote/activities/id/${this.props.currentEventId}`, {
+    authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/pilote/activities/id/${this.props.currentEventId}`, {
       method: 'PUT',
       body: JSON.stringify({
         action: 'register',
@@ -71,7 +71,7 @@ class PiloteModal extends React.Component {
   }
 
   handleUnregister() {
-    authFetch(`${process.env.REACT_APP_BACKEND}/v0/pilote/activities/id/${this.props.currentEventId}`, {
+    authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/pilote/activities/id/${this.props.currentEventId}`, {
       method: 'PUT',
       body: JSON.stringify({
         action: 'unregister',

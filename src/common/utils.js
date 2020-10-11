@@ -48,7 +48,7 @@ function authFetch(url, options = {headers: {}}) {
   const newOptions = options;
   const jwt = window.localStorage.getItem('jwtPDC');
   if(typeof(jwt) === 'undefined') {
-    document.location.href = `${process.env.REACT_APP_BACKEND}/v0/login`;
+    document.location.href = `${window.localStorage.getItem('PDC_AGENCE')}/v0/login`;
   }
   if(typeof(newOptions.headers) === 'undefined') {
     newOptions.headers = {};
@@ -57,23 +57,23 @@ function authFetch(url, options = {headers: {}}) {
   return fetch(url, newOptions)
     .then(res => res.json(res))
     .catch(e => {
-      document.location.href = `${process.env.REACT_APP_BACKEND}/v0/login`;
+      document.location.href = `${window.localStorage.getItem('PDC_AGENCE')}/v0/login`;
     })
 }
 
 function listPedagogy() {
-  return fetch(`${process.env.REACT_APP_BACKEND}/v0/pedagogy`)
+  return fetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/pedagogy`)
     .then(res => res.json())
 }
 
 function listCooperators() {
-  return fetch(`${process.env.REACT_APP_BACKEND}/v0/cooperators`)
+  return fetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/cooperators`)
     .then(res => res.json())
 }
 
 function logout() {
   window.localStorage.removeItem('jwtPDC');
-  document.location.href = `${process.env.REACT_APP_BACKEND}/v0/logout`;
+  document.location.href = `${window.localStorage.getItem('PDC_AGENCE')}/v0/logout`;
 }
 
 function alert(text) {

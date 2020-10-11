@@ -61,7 +61,7 @@ class PiloteCalendar extends React.Component {
   }
 
   refresh() {
-    authFetch(`${process.env.REACT_APP_BACKEND}/v0/pilote/activities`)
+    authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/pilote/activities`)
       .then(events => {
         this.setState({events: convertToBigCalendarEvents(events, this.props.whoami)})
       })

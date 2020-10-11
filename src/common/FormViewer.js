@@ -123,11 +123,11 @@ class FormViewer extends React.Component {
   delete(event) {
     const yes = window.confirm('Etes vous certain.e.s de vouloir supprimer cet utilisateur ?');
     if(yes) {
-      authFetch(`${process.env.REACT_APP_BACKEND}/v0${this.props.api}/id/${this.state.selected}`, {
+      authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0${this.props.api}/id/${this.state.selected}`, {
         method: 'DELETE'
       })
       .then(res => {
-        return authFetch(`${process.env.REACT_APP_BACKEND}/v0${this.props.api}${this.props.special}`);
+        return authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0${this.props.api}${this.props.special}`);
       })
       .then(res => {
         const newUserData = this.state.form.userData;
@@ -213,7 +213,7 @@ class FormViewer extends React.Component {
           }
         })
         if (typeof(id) !== 'undefined' && id !== 'none') {
-          return authFetch(`${process.env.REACT_APP_BACKEND}/v0${this.props.api}/id/${id}`, {
+          return authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0${this.props.api}/id/${id}`, {
             method: 'PUT',
             body: JSON.stringify(data),
             headers:{
@@ -221,7 +221,7 @@ class FormViewer extends React.Component {
             }
           })
         }
-        return authFetch(`${process.env.REACT_APP_BACKEND}/v0${this.props.api}`, {
+        return authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0${this.props.api}`, {
           method: 'POST',
           body: JSON.stringify(data),
           headers:{
@@ -240,7 +240,7 @@ class FormViewer extends React.Component {
         if(id === 'none') {
           id = res;
         }
-        return authFetch(`${process.env.REACT_APP_BACKEND}/v0${this.props.api}${this.state.special}`);
+        return authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0${this.props.api}${this.state.special}`);
       })
       .then(res => {
         this.setState({list: res, selected: id});
@@ -258,14 +258,14 @@ class FormViewer extends React.Component {
   update(selected) {
     const title = this.props.formTitle;
     let form;
-    fetch(`${process.env.REACT_APP_BACKEND}/v0/forms/title/${this.props.formType}/${title}`)
+    fetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/forms/title/${this.props.formType}/${title}`)
     .then(res => res.json())
     .then(res => {
       form = $(this.fv.current).formRender({
         formData: res.formData
       });
 
-      return authFetch(`${process.env.REACT_APP_BACKEND}/v0${this.props.api}${this.state.special}`);
+      return authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0${this.props.api}${this.state.special}`);
     })
     .then(res => {
       const selected = window.localStorage.getItem(`${this.props.formType}_id`) || 'none';

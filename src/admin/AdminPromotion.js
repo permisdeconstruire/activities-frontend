@@ -128,7 +128,7 @@ class AdminPromotion extends React.Component {
   delete(event) {
     const yes = window.confirm('Etes vous certain.e.s de vouloir supprimer cette promotion ?');
     if(yes) {
-      authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/promotions/id/${this.state.selected}`, {
+      authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/admin/promotions/id/${this.state.selected}`, {
         method: 'DELETE'
       })
       .then(res => {
@@ -159,7 +159,7 @@ class AdminPromotion extends React.Component {
   }
 
   updateParcours() {
-    authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/parcours`)
+    authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/admin/parcours`)
       .then(res => {
         const newState = this.state;
         newState.parcours = res;
@@ -168,7 +168,7 @@ class AdminPromotion extends React.Component {
   }
 
   updatePromotions() {
-    authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/promotions`)
+    authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/admin/promotions`)
       .then(res => {
         const newState = this.defaultState();
         newState.promotions = res;
@@ -180,7 +180,7 @@ class AdminPromotion extends React.Component {
 
   componentDidMount() {
     this.updateParcours();
-    authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/pilotes?filter=ph_statut%3A(%22Suivi%22)`)
+    authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/admin/pilotes?filter=ph_statut%3A(%22Suivi%22)`)
       .then(res => {
         this.setState({pilotes: res});
       })
@@ -189,7 +189,7 @@ class AdminPromotion extends React.Component {
 
   handleSubmit() {
     if(this.state.selected === 'none') {
-      authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/promotions`, {
+      authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/admin/promotions`, {
         method: 'POST',
         body: JSON.stringify({
           ...this.state.currentPromotion,
@@ -204,7 +204,7 @@ class AdminPromotion extends React.Component {
         this.updatePromotions()
       })
     } else {
-      authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/promotions/id/${this.state.selected}`, {
+      authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/admin/promotions/id/${this.state.selected}`, {
         method: 'PUT',
         body: JSON.stringify({
           ...this.state.currentPromotion,

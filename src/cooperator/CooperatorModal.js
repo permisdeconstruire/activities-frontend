@@ -61,7 +61,7 @@ class CooperatorModal extends React.Component {
   }
 
   getEvent(piloteId) {
-    return authFetch(`${process.env.REACT_APP_BACKEND}/v0/cooperator/activities/id/${this.props.currentEventId}/pilote/${piloteId}`)
+    return authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/cooperator/activities/id/${this.props.currentEventId}/pilote/${piloteId}`)
   }
 
   handleSubmitSpecial(activityAction){
@@ -69,7 +69,7 @@ class CooperatorModal extends React.Component {
       pilote: {_id: this.state.pilote._id, pseudo: this.state.pilote.pseudo},
       activityAction,
     }
-    authFetch(`${process.env.REACT_APP_BACKEND}/v0/cooperator/activities/id/${this.props.currentEventId}`, {
+    authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/cooperator/activities/id/${this.props.currentEventId}`, {
       method: 'PUT',
       body: JSON.stringify(data),
       headers:{
@@ -116,7 +116,7 @@ class CooperatorModal extends React.Component {
       }
     }
 
-    authFetch(`${process.env.REACT_APP_BACKEND}/v0/cooperator/activities/id/${this.props.currentEventId}`, {
+    authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/cooperator/activities/id/${this.props.currentEventId}`, {
       method: 'PUT',
       body: JSON.stringify(data),
       headers:{
@@ -128,7 +128,7 @@ class CooperatorModal extends React.Component {
   }
 
   handleSubmitComments(e) {
-    authFetch(`${process.env.REACT_APP_BACKEND}/v0/cooperator/activities/id/${this.props.currentEventId}/comment`, {
+    authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/cooperator/activities/id/${this.props.currentEventId}/comment`, {
       method: 'PUT',
       body: JSON.stringify({comments: this.state.globalActivityComments}),
       headers:{
@@ -152,7 +152,7 @@ class CooperatorModal extends React.Component {
         }
       }
 
-      eventPromises.push(authFetch(`${process.env.REACT_APP_BACKEND}/v0/cooperator/activities/id/${this.props.currentEventId}`, {
+      eventPromises.push(authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/cooperator/activities/id/${this.props.currentEventId}`, {
         method: 'PUT',
         body: JSON.stringify(data),
         headers:{
@@ -174,7 +174,7 @@ class CooperatorModal extends React.Component {
         }
       }
 
-      eventPromises.push(authFetch(`${process.env.REACT_APP_BACKEND}/v0/cooperator/activities/id/${this.props.currentEventId}`, {
+      eventPromises.push(authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/cooperator/activities/id/${this.props.currentEventId}`, {
         method: 'PUT',
         body: JSON.stringify(data),
         headers:{

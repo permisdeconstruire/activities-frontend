@@ -45,7 +45,7 @@ class FormsBuilder extends React.Component {
   handleDelete() {
     const yes = window.confirm('Etes vous certain.e.s de vouloir supprimer ce formulaire ?');
     if(yes) {
-      authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/forms/id/${this.state.selectedForm._id}`, {
+      authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/admin/forms/id/${this.state.selectedForm._id}`, {
         method: 'DELETE'
       })
       .then(res => {
@@ -59,7 +59,7 @@ class FormsBuilder extends React.Component {
   }
 
   getForms(id) {
-    authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/forms`)
+    authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/admin/forms`)
     .then(res => {
       let newSelectedForm = this.state.selectedForm;
       if(id && id !== 'none'){
@@ -91,7 +91,7 @@ class FormsBuilder extends React.Component {
 
   saveData() {
     if(this.state.selectedForm._id !== 'none') {
-      authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/forms/id/${this.state.selectedForm._id}`, {
+      authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/admin/forms/id/${this.state.selectedForm._id}`, {
         method: 'PUT',
         body: JSON.stringify({
           title: this.state.selectedForm.title,
@@ -107,7 +107,7 @@ class FormsBuilder extends React.Component {
         alert('Formulaire sauvegardé !')
       })
     } else {
-      authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/forms`, {
+      authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/admin/forms`, {
         method: 'POST',
         body: JSON.stringify({
           title: this.state.selectedForm.title,

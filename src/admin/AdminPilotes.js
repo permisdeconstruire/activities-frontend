@@ -62,9 +62,9 @@ class AdminPilotes extends React.Component {
         sessions: []
       })
 
-      const evaluations = await authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/activities/promotion/${promotion._id}/pilote/${pilote._id}?startDate=${promotion.startDate}`)
+      const evaluations = await authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/admin/activities/promotion/${promotion._id}/pilote/${pilote._id}?startDate=${promotion.startDate}`)
 
-      const activities = await authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/activities/promotion/${promotion._id}`)
+      const activities = await authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/admin/activities/promotion/${promotion._id}`)
       for(let j = 0; j < activities.length; j += 1) {
         const activity = activities[j];
         const objectives = [];
@@ -98,14 +98,14 @@ class AdminPilotes extends React.Component {
   update() {
     let pilotes;
     let options;
-    authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/pilotes`)
+    authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/admin/pilotes`)
       .then(res => {
         pilotes = res;
-        return authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/options`)
+        return authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/admin/options`)
       })
       .then(res => {
         options = res
-        return authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/promotions`)
+        return authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/admin/promotions`)
       })
       .then(res => {
         this.setState({pilotes, options, promotions: res})
@@ -133,7 +133,7 @@ class AdminPilotes extends React.Component {
       {this.state.pilote.pseudo &&
         <Row>
           <Col sm={8} style={({margin:'auto'})}>
-            <a href={`${process.env.REACT_APP_BACKEND}/v0/admin/pilotes/id/${this.state.pilote._id}/activities.pdf?token=${window.localStorage.getItem('jwtPDC')}`} target="_blank">Télécharger son agenda</a>
+            <a href={`${window.localStorage.getItem('PDC_AGENCE')}/v0/admin/pilotes/id/${this.state.pilote._id}/activities.pdf?token=${window.localStorage.getItem('jwtPDC')}`} target="_blank">Télécharger son agenda</a>
           </Col>
         </Row>
       }

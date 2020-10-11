@@ -35,7 +35,7 @@ class PublicCalendar extends React.Component {
   }
 
   refresh() {
-    fetch(`${process.env.REACT_APP_BACKEND}/v0/activities`)
+    fetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/activities`)
       .then(res => res.json())
       .then(events => {
         this.setState({events: convertToBigCalendarEvents(events, this.props.whoami)})

@@ -29,7 +29,7 @@ class AdminHeader extends React.Component {
   }
 
   getForms() {
-    authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/forms`)
+    authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/admin/forms`)
     .then(res => {
       this.setState({forms: res})
     })

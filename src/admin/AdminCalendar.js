@@ -67,11 +67,11 @@ class AdminCalendar extends React.Component {
   }
 
   refresh() {
-    authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/activities`)
+    authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/admin/activities`)
       .then(events => {
         this.setState({events: convertToBigCalendarEvents(events, this.state.selectedPilote)})
       })
-    authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/pilotes?filter=NOT%20ph_statut%3A(%22Termin%C3%A9%20Jamais%20vu%22%2C%22Termin%C3%A9%20Accueilli%22%2C%22Pas%20d'effet%20imm%C3%A9diat%22%2C%22Projet%20de%20vie%20valid%C3%A9%22%2C%20%22Projet%20de%20vie%20travaill%C3%A9%22%2C%20%22Suspension%22%2C%20%22Pause%22%2C%20%22Termin%C3%A9%22)`)
+    authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/admin/pilotes?filter=NOT%20ph_statut%3A(%22Termin%C3%A9%20Jamais%20vu%22%2C%22Termin%C3%A9%20Accueilli%22%2C%22Pas%20d'effet%20imm%C3%A9diat%22%2C%22Projet%20de%20vie%20valid%C3%A9%22%2C%20%22Projet%20de%20vie%20travaill%C3%A9%22%2C%20%22Suspension%22%2C%20%22Pause%22%2C%20%22Termin%C3%A9%22)`)
       .then(pilotes => {
         this.setState({pilotes})
       })
@@ -97,7 +97,7 @@ class AdminCalendar extends React.Component {
     } else {
       const pilote = this.state.pilotes.find(pilote => pilote._id === this.state.selectedPilote);
       if(event.isRegistered) {
-        authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/activities/id/${event._id}/pilote`, {
+        authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/admin/activities/id/${event._id}/pilote`, {
           method: 'PUT',
           body: JSON.stringify({
             pilote,
@@ -110,7 +110,7 @@ class AdminCalendar extends React.Component {
           this.refresh();
         })
       } else {
-          authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/activities/id/${event._id}/pilote`, {
+          authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/admin/activities/id/${event._id}/pilote`, {
             method: 'PUT',
             body: JSON.stringify({
               pilote,
@@ -138,7 +138,7 @@ class AdminCalendar extends React.Component {
     }
 
 
-    authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/activities/id/${id}`, {
+    authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/admin/activities/id/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
       headers:{

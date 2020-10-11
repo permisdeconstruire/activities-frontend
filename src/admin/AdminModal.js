@@ -122,7 +122,7 @@ class AdminModal extends React.Component {
     listCooperators()
       .then(res => {
         this.allCooperators = res;
-        return authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/promotions`)
+        return authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/admin/promotions`)
       })
       .then(res => {
         this.allPromotions = res;
@@ -146,7 +146,7 @@ class AdminModal extends React.Component {
           const promotion = this.allPromotions.find(p => p._id === newState.promotion._id)
           if(typeof(promotion) !== 'undefined') {
             newState.promotion = promotion;
-            authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/parcours/title/${promotion.parcours}`)
+            authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/admin/parcours/title/${promotion.parcours}`)
             .then((parcours) => {
               const sessions = [];
               for(let i = 0; i < parcours.length; i += 1) {
@@ -180,7 +180,7 @@ class AdminModal extends React.Component {
         if(typeof(newState.promotion) !== 'undefined' && newState.promotion._id !== 'none') {
           const promotion = this.allPromotions.find(p => p._id === newState.promotion._id)
           newState.promotion = promotion;
-          authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/parcours/title/${promotion.parcours}`)
+          authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/admin/parcours/title/${promotion.parcours}`)
           .then((parcours) => {
             const sessions = [];
             for(let i = 0; i < parcours.length; i += 1) {
@@ -225,7 +225,7 @@ class AdminModal extends React.Component {
   }
 
   handleUnregisterPilote(participant) {
-    authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/activities/id/${this.state._id}/pilote`, {
+    authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/admin/activities/id/${this.state._id}/pilote`, {
       method: 'PUT',
       body: JSON.stringify({
         pilote: participant,
@@ -240,7 +240,7 @@ class AdminModal extends React.Component {
   }
 
   registerPilote(participant, eventId) {
-    return authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/activities/id/${eventId}/pilote`, {
+    return authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/admin/activities/id/${eventId}/pilote`, {
       method: 'PUT',
       body: JSON.stringify({
         pilote: participant,
@@ -317,7 +317,7 @@ class AdminModal extends React.Component {
     const promotion = this.allPromotions.find(p => p._id === event.target.value)
     if(typeof(promotion) !== 'undefined') {
       delete promotion.level;
-      authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/parcours/title/${promotion.parcours}`)
+      authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/admin/parcours/title/${promotion.parcours}`)
         .then((parcours) => {
           const sessions = [];
           for(let i = 0; i < parcours.length; i += 1) {
@@ -367,7 +367,7 @@ class AdminModal extends React.Component {
   handleDelete() {
     const yes = window.confirm('Etes vous certain.e.s de vouloir supprimer cet événement ?');
     if(yes) {
-      authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/activities/id/${this.state._id}`, {
+      authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/admin/activities/id/${this.state._id}`, {
         method: 'DELETE'
       })
       .then(res => {
@@ -432,7 +432,7 @@ class AdminModal extends React.Component {
     }
 
     if(id !== '') {
-      authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/activities/id/${id}`, {
+      authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/admin/activities/id/${id}`, {
         method: 'PUT',
         body: JSON.stringify(data),
         headers:{
@@ -453,7 +453,7 @@ class AdminModal extends React.Component {
 
       })
     } else {
-      authFetch(`${process.env.REACT_APP_BACKEND}/v0/admin/activities`, {
+      authFetch(`${window.localStorage.getItem('PDC_AGENCE')}/v0/admin/activities`, {
         method: 'POST',
         body: JSON.stringify(data),
         headers:{
@@ -656,7 +656,7 @@ class AdminModal extends React.Component {
                       {this.allCooperators.sort((a,b) => a.titre<b.titre ? -1 : 1).map((c) => <option key={c._id} value={c._id}>{c.titre}</option>)}
                     </FormControl>
                   </Col>
-                  <Col sm={1}><a target="_blank" href={`${process.env.REACT_APP_BACKEND}/v0/admin/cooperators/id/${cooperator._id}?token=${window.localStorage.getItem('jwtPDC')}`} className="btn btn-sm btn-primary" title="Impersonate">😒</a></Col>
+                  <Col sm={1}><a target="_blank" href={`${window.localStorage.getItem('PDC_AGENCE')}/v0/admin/cooperators/id/${cooperator._id}?token=${window.localStorage.getItem('jwtPDC')}`} className="btn btn-sm btn-primary" title="Impersonate">😒</a></Col>
                   {index > 0 && (<Col sm={1}><Button bsSize="small" bsStyle="danger" onClick={this.deleteCooperator.bind(this, index)}>-</Button></Col>)}
                   </div>
                 )}
